@@ -7,6 +7,7 @@ Responsive administration and member portal built with React, Vite, and Material
 - Responsive authenticated dashboard and navigation
 - Separate administrator and member authentication flows
 - OTP-based first-time member password setup
+- Email-code password reset for administrators and members
 - Member dashboard, attendance history, events, and profile
 - Member registration, editing, filtering, and face enrollment
 - Event list, card, and calendar views
