@@ -1,7 +1,6 @@
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import EventIcon from "@mui/icons-material/Event";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -21,11 +20,6 @@ const navigation = [
     title: "Events",
     icon: EventIcon,
     path: "/events",
-  },
-  {
-    title: "Create Event",
-    icon: AddCircleIcon,
-    path: "/events/create",
   },
   {
     title: "Attendance Scanner",
