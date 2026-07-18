@@ -55,6 +55,17 @@ const STATUS_CONFIG = {
 export default function EnrollmentStatus({ currentStep, status = "waiting" }) {
   const pose = POSES[currentStep];
 
+  if (!pose) {
+    return (
+      <Box sx={{ mb: 2 }}>
+        <Alert severity="success" icon={<FaceIcon />}>
+          <AlertTitle>Enrollment complete</AlertTitle>
+          <Typography variant="body2">All required face positions have been captured.</Typography>
+        </Alert>
+      </Box>
+    );
+  }
+
   const config = STATUS_CONFIG[status];
 
   return (

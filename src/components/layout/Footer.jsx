@@ -63,7 +63,7 @@ export default function Footer() {
 
           {/* Right */}
 
-          <Stack direction="row" spacing={3}>
+          <Stack direction="row" spacing={{ xs: 1.5, sm: 3 }} flexWrap="wrap" useFlexGap justifyContent="center">
             <Link href="#" underline="hover" color="inherit" variant="body2">
               Privacy
             </Link>

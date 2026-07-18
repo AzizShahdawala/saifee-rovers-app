@@ -1,17 +1,5 @@
+import { Box } from "@mui/material";
+
 export default function FaceOverlay() {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        width: 250,
-        height: 320,
-        border: "3px dashed #00ff00",
-        borderRadius: "50%",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%,-50%)",
-        pointerEvents: "none",
-      }}
-    />
-  );
+  return <Box sx={{ position: "absolute", width: "clamp(140px, 42%, 250px)", height: "clamp(190px, 68%, 320px)", border: "3px dashed #45e38b", borderRadius: "50%", top: "50%", left: "50%", transform: "translate(-50%, -50%)", pointerEvents: "none" }} />;
 }

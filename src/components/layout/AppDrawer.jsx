@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState } from "react";
 
 import { Link, useLocation } from "react-router-dom";
@@ -54,8 +53,7 @@ export default function AppDrawer({
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-
-    window.location.href = "/";
+    window.location.assign(`${import.meta.env.BASE_URL}#/`);
   };
 
   const isActiveRoute = (path) => {
@@ -115,7 +113,7 @@ export default function AppDrawer({
           )}
         </Box>
 
-        <IconButton onClick={toggleCollapse}>
+        <IconButton onClick={toggleCollapse} sx={{ display: isMobile ? "none" : "inline-flex" }}>
           {collapsed ? <MenuIcon /> : <MenuOpenIcon />}
         </IconButton>
       </Toolbar>
@@ -260,6 +258,18 @@ export default function AppDrawer({
 
   return (
     <>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onMobileClose || (() => setMobileOpen?.(false))}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { width: "min(86vw, 290px)", overflowX: "hidden" },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
       <Drawer
         variant="permanent"
         sx={{

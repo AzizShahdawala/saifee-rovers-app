@@ -218,6 +218,9 @@ const DataTable = ({
       <TableContainer
         sx={{
           maxHeight: maxHeight || "none",
+          width: "100%",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         <Table
@@ -398,6 +401,11 @@ const DataTable = ({
           sx={{
             borderTop: "1px solid",
             borderColor: "divider",
+            overflowX: "auto",
+            "& .MuiTablePagination-toolbar": {
+              px: { xs: 1, sm: 2 },
+              minWidth: { xs: 480, sm: "auto" },
+            },
           }}
         />
       )}

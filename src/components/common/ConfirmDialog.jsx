@@ -109,9 +109,12 @@ const ConfirmDialog = ({
 
       <DialogActions
         sx={{
-          px: 3,
+          px: { xs: 2, sm: 3 },
           pb: 2.5,
           pt: 1.5,
+          flexWrap: "wrap",
+          gap: 1,
+          "& .MuiButton-root": { flex: { xs: "1 1 120px", sm: "0 0 auto" } },
         }}
       >
         <Button

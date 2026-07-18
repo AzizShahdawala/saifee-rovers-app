@@ -59,9 +59,9 @@ export default function MemberForm() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 5 }}>
+    <Container maxWidth="lg" disableGutters sx={{ mt: 0, mb: { xs: 2, sm: 5 } }}>
       <Card elevation={4}>
-        <CardContent>
+        <CardContent sx={{ p: { xs: 2, sm: 3 }, "&:last-child": { pb: { xs: 2, sm: 3 } } }}>
           <Typography variant="h4" align="center" gutterBottom>
             Register Scout Member
           </Typography>
@@ -75,7 +75,7 @@ export default function MemberForm() {
 
           <Box component="form" onSubmit={handleSubmit(submit)} sx={{ mt: 4 }}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Full Name"
@@ -85,7 +85,7 @@ export default function MemberForm() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Phone Number"
@@ -95,7 +95,7 @@ export default function MemberForm() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Email"
@@ -105,7 +105,7 @@ export default function MemberForm() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Patrol Name"
@@ -122,7 +122,7 @@ export default function MemberForm() {
 
             <Grid container spacing={4}>
               {/* LEFT PANEL */}
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
@@ -157,7 +157,7 @@ export default function MemberForm() {
               </Grid>
 
               {/* RIGHT PANEL */}
-              <Grid item xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
@@ -165,7 +165,7 @@ export default function MemberForm() {
                     </Typography>
 
                     <Box sx={{ mb: 2 }}>
-                      <Stepper activeStep={currentStep} alternativeLabel>
+                      <Stepper activeStep={currentStep} alternativeLabel sx={{ overflowX: "auto", pb: 1, "& .MuiStep-root": { minWidth: { xs: 92, sm: "auto" } } }}>
                         <Step>
                           <StepLabel>Front</StepLabel>
                         </Step>
@@ -255,7 +255,7 @@ export default function MemberForm() {
                 size="large"
                 disabled={loading || Object.keys(capturedImages).length !== 5}
                 sx={{
-                  width: 300,
+                  width: { xs: "100%", sm: 300 },
                   height: 50,
                 }}
               >

@@ -66,12 +66,12 @@ export default function DashboardLayout({ children }) {
             width: "100%",
             overflowX: "hidden",
             px: {
-              xs: 2,
+              xs: 1.5,
               sm: 3,
               lg: 4,
             },
             py: {
-              xs: 2.5,
+              xs: 2,
               sm: 3,
               lg: 4,
             },

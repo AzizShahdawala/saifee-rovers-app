@@ -182,7 +182,7 @@ const Reports = () => {
           },
         ]}
         actions={
-          <Stack direction="row" spacing={1}><Button
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" }, "& .MuiButton-root": { width: { xs: "100%", sm: "auto" } } }}><Button
             variant="contained"
             startIcon={<DownloadOutlined />}
             onClick={handleExcelExport}
@@ -200,7 +200,7 @@ const Reports = () => {
       />
 
       <Grid container spacing={2.5} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Total Records"
             value={records.length}
@@ -210,7 +210,7 @@ const Reports = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Present"
             value={presentCount}
@@ -220,7 +220,7 @@ const Reports = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Absent"
             value={absentCount}
@@ -230,7 +230,7 @@ const Reports = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Attendance Rate"
             value={`${attendanceRate}%`}
@@ -262,7 +262,7 @@ const Reports = () => {
             fullWidth={false}
             sx={{
               width: {
-                xs: 190,
+                xs: "100%",
                 sm: 300,
               },
             }}

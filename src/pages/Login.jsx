@@ -145,7 +145,7 @@ export default function Login() {
           position: "relative",
           width: "100%",
           maxWidth: 460,
-          p: { xs: 3, sm: 5 },
+          p: { xs: 2.5, sm: 5 },
           border: "1px solid rgba(255,255,255,.35)",
           bgcolor: "rgba(255,255,255,.86)",
           backdropFilter: "blur(22px)",
@@ -197,7 +197,7 @@ export default function Login() {
             }}
           />
 
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "flex-start", sm: "center" }} justifyContent="space-between" spacing={{ xs: 0.5, sm: 0 }}>
             <FormControlLabel
               control={<Checkbox checked={remember} onChange={(event) => setRemember(event.target.checked)} />}
               label="Remember me"

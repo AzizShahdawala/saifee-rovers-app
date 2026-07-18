@@ -116,12 +116,14 @@ const DashboardCard = ({
         }
         action={loading ? null : action || defaultAction}
         sx={{
-          px: 2.5,
-          py: 2,
-          alignItems: "center",
+          px: { xs: 1.75, sm: 2.5 },
+          py: { xs: 1.5, sm: 2 },
+          alignItems: { xs: "flex-start", sm: "center" },
+          flexWrap: "wrap",
           "& .MuiCardHeader-action": {
-            alignSelf: "center",
+            alignSelf: { xs: "flex-start", sm: "center" },
             m: 0,
+            maxWidth: "100%",
           },
           "& .MuiCardHeader-avatar": {
             mr: 1.5,
@@ -133,9 +135,9 @@ const DashboardCard = ({
 
       <CardContent
         sx={{
-          p: noPadding ? 0 : 2.5,
+          p: noPadding ? 0 : { xs: 1.75, sm: 2.5 },
           "&:last-child": {
-            pb: noPadding ? 0 : 2.5,
+            pb: noPadding ? 0 : { xs: 1.75, sm: 2.5 },
           },
           ...contentSx,
         }}

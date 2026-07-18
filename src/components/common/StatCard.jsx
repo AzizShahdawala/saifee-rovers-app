@@ -96,9 +96,9 @@ const StatCard = ({
     >
       <CardContent
         sx={{
-          p: 2.5,
+          p: { xs: 2, sm: 2.5 },
           "&:last-child": {
-            pb: 2.5,
+            pb: { xs: 2, sm: 2.5 },
           },
         }}
       >
@@ -129,7 +129,7 @@ const StatCard = ({
                   variant="body2"
                   color="text.secondary"
                   fontWeight={500}
-                  noWrap
+                  sx={{ overflowWrap: "anywhere" }}
                 >
                   {title}
                 </Typography>

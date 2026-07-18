@@ -234,13 +234,13 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
         zIndex: 1300,
       }}
     >
-      <Toolbar>
+      <Toolbar sx={{ px: { xs: 1, sm: 2 }, minWidth: 0 }}>
         <IconButton
           edge="start"
           onClick={toggleDrawer}
           aria-label="Open navigation menu"
           sx={{
-            mr: 2,
+            mr: { xs: 0.5, sm: 2 },
             display: {
               xs: "inline-flex",
               lg: "none",
@@ -250,12 +250,12 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
           <MenuIcon />
         </IconButton>
 
-        <Box>
-          <Typography variant="h5" fontWeight={700}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h5" fontWeight={700} noWrap sx={{ fontSize: { xs: "1rem", sm: "1.5rem" }, maxWidth: { xs: 125, sm: 260 } }}>
             {title}
           </Typography>
 
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ display: { xs: "none", sm: "block" } }}>
             {dateTime.toLocaleDateString()}•{dateTime.toLocaleTimeString()}
           </Typography>
         </Box>
@@ -543,6 +543,7 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
             paper: {
               sx: {
                 width: 260,
+                maxWidth: "calc(100vw - 24px)",
                 mt: 1.5,
                 borderRadius: 3,
                 overflow: "hidden",

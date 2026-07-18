@@ -64,6 +64,9 @@ const theme = createTheme({
           borderRadius: 10,
           padding: "10px 22px",
           fontWeight: 600,
+          "@media (max-width:600px)": {
+            padding: "8px 14px",
+          },
         },
 
         containedPrimary: {
@@ -84,6 +87,25 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 10,
+        },
+      },
+    },
+
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          margin: 12,
+          maxHeight: "calc(100% - 24px)",
+        },
+      },
+    },
+
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          flexWrap: "wrap",
+          gap: 8,
+          padding: "12px 20px 20px",
         },
       },
     },

@@ -133,7 +133,7 @@ const Dashboard = () => {
       />
 
       <Grid container spacing={2.5}>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Total Members"
             value={dashboardData.totalMembers}
@@ -144,21 +144,21 @@ const Dashboard = () => {
           />
         </Grid>
 
-        <Grid item xs={12} lg={8}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <DashboardCard title="Attendance Analytics" subtitle="Seven-day check-in trend" icon={<TrendingUp />}>
             <AttendanceChart data={dashboardData.attendanceTrend} />
           </DashboardCard>
         </Grid>
 
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardCard title="Patrol Distribution" subtitle="Members by patrol" icon={<GroupsOutlined />}>
             <PatrolChart data={dashboardData.patrolDistribution} />
           </DashboardCard>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <DashboardCard title="Recognition Health" subtitle="Live face-recognition readiness" icon={<CheckCircleOutlined />}>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={3} divider={<Divider orientation="vertical" flexItem />}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={3} divider={<Divider orientation="vertical" flexItem sx={{ display: { xs: "none", sm: "block" } }} />}>
               <Box><Typography variant="h4" fontWeight={800} color="success.main">{dashboardData.recognitionAccuracy}%</Typography><Typography color="text.secondary">Recognition accuracy</Typography></Box>
               <Box><Typography variant="h4" fontWeight={800}>{dashboardData.totalMembers}</Typography><Typography color="text.secondary">Enrolled identities</Typography></Box>
               <Box><StatusChip status={dashboardData.recognitionAccuracy >= 80 ? "active" : "pending"} /><Typography color="text.secondary" sx={{ mt: 1 }}>Recognition status</Typography></Box>
@@ -166,13 +166,13 @@ const Dashboard = () => {
           </DashboardCard>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <DashboardCard title="Recent Members" subtitle="Latest registrations" icon={<PeopleOutlined />} action={<Button size="small" onClick={() => navigate("/members")}>View Members</Button>}>
             {dashboardData.recentMembers.length ? <Stack direction="row" spacing={2} sx={{ overflowX: "auto", pb: 1 }}>{dashboardData.recentMembers.map((member) => <Paper key={member._id} variant="outlined" sx={{ p: 2, minWidth: 190, boxShadow: "none" }}><Stack direction="row" spacing={1.25} alignItems="center"><Avatar src={member.profileImage}>{member.name?.[0] || "M"}</Avatar><Box><Typography variant="body2" fontWeight={800}>{member.name}</Typography><Typography variant="caption" color="text.secondary">{member.patrol || "No patrol"}</Typography></Box></Stack></Paper>)}</Stack> : <EmptyState title="No recent members" description="New registrations will appear here." minHeight={150} />}
           </DashboardCard>
         </Grid>
 
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Active Events"
             value={dashboardData.activeEvents}
@@ -183,7 +183,7 @@ const Dashboard = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Today's Attendance"
             value={dashboardData.todayAttendance}
@@ -194,7 +194,7 @@ const Dashboard = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Attendance Rate"
             value={`${dashboardData.attendanceRate}%`}
@@ -205,7 +205,7 @@ const Dashboard = () => {
           />
         </Grid>
 
-        <Grid item xs={12} lg={7}>
+        <Grid size={{ xs: 12, lg: 7 }}>
           <DashboardCard
             title="Recent Attendance"
             subtitle="Latest member check-ins"
@@ -277,7 +277,7 @@ const Dashboard = () => {
           </DashboardCard>
         </Grid>
 
-        <Grid item xs={12} lg={5}>
+        <Grid size={{ xs: 12, lg: 5 }}>
           <DashboardCard
             title="Upcoming Events"
             subtitle="Events scheduled next"
