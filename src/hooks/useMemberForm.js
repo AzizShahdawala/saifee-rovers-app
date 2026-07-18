@@ -26,6 +26,8 @@ export default function useMemberForm() {
 
       formData.append("patrol", data.patrol);
 
+      formData.append("instrument", data.instrument);
+
       formData.append("isPatrolLeader", String(Boolean(data.isPatrolLeader)));
 
       for (const pose in capturedImages) {

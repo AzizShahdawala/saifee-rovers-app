@@ -55,7 +55,7 @@ export default function MemberProfile() {
 
   if (!member && !error) return <Box sx={{ minHeight: 300, display: "grid", placeItems: "center" }}><CircularProgress /></Box>;
   if (!member) return <Alert severity="error">{error}</Alert>;
-  const fields = [["Full name", member.name], ["Email", member.email], ["Phone", member.phone], ["Patrol", member.patrol], ["Member status", member.status], ["Joined", new Date(member.createdAt).toLocaleDateString("en-IN", { dateStyle: "long" })]];
+  const fields = [["Full name", member.name], ["Email", member.email], ["Phone", member.phone], ["Patrol", member.patrol], ["Instrument", member.instrument || "Not assigned"], ["Member status", member.status], ["Joined", new Date(member.createdAt).toLocaleDateString("en-IN", { dateStyle: "long" })]];
 
   return <Stack spacing={3}>
     <Box><Typography variant="h4" fontWeight={900}>My profile</Typography><Typography color="text.secondary">Manage your profile picture, account security, and membership information.</Typography></Box>

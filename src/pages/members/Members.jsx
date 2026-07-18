@@ -38,9 +38,9 @@ import {
   SearchBar,
   StatusChip,
 } from "../../components/common";
+import { INSTRUMENTS, PATROLS } from "../../constants/memberOptions";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-const PATROLS = ["Fox", "Dove", "Bull", "Peacock"];
 
 const Members = () => {
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ const Members = () => {
     const query = searchText.trim().toLowerCase();
 
     return members.filter((member) => {
-      const matchesQuery = !query || [member.name, member.email, member.phone, member.patrol].some(
+      const matchesQuery = !query || [member.name, member.email, member.phone, member.patrol, member.instrument].some(
         (value) =>
           String(value || "")
             .toLowerCase()
@@ -100,6 +100,9 @@ const Members = () => {
       return matchesQuery && matchesPatrol && matchesStatus;
     });
   }, [members, patrolFilter, searchText, statusFilter]);
+
+  const patrolLeader = editMember ? members.find((member) => member._id !== editMember._id && member.patrol === editMember.patrol && member.isPatrolLeader) : null;
+  const bandInspector = editMember ? members.find((member) => member._id !== editMember._id && member.instrument === "Band Inspector") : null;
 
   const handleSaveMember = async () => {
     if (!editMember?.name?.trim()) return;
@@ -228,6 +231,13 @@ const Members = () => {
       render: (member) => member.isPatrolLeader ? <StatusChip status="leader" label="Leader" /> : "Member",
     },
     {
+      id: "instrument",
+      label: "Instrument",
+      sortable: true,
+      minWidth: 150,
+      render: (member) => member.instrument || "Not assigned",
+    },
+    {
       id: "faceEnrolled",
       label: "Face Enrollment",
       minWidth: 150,
@@ -323,7 +333,7 @@ const Members = () => {
         <SearchBar
           value={searchText}
           onChange={setSearchText}
-          placeholder="Search by name, email, phone or patrol..."
+          placeholder="Search by name, email, phone, patrol or instrument..."
         />
         </Box>
         <FormControl size="small" sx={{ minWidth: 160 }}><InputLabel>Patrol</InputLabel><Select value={patrolFilter} label="Patrol" onChange={(event) => setPatrolFilter(event.target.value)}><MenuItem value="all">All patrols</MenuItem>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</Select></FormControl>
@@ -376,10 +386,13 @@ const Members = () => {
           <TextField label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
           <TextField label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
           <TextField label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
-          <TextField select label="Patrol" value={editMember?.patrol || ""} onChange={(event) => setEditMember((current) => ({ ...current, patrol: event.target.value }))}>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</TextField>
-          <FormControlLabel control={<Checkbox checked={Boolean(editMember?.isPatrolLeader)} onChange={(event) => setEditMember((current) => ({ ...current, isPatrolLeader: event.target.checked }))} />} label="Patrol leader" />
+          <TextField select label="Patrol" value={editMember?.patrol || ""} onChange={(event) => setEditMember((current) => ({ ...current, patrol: event.target.value, isPatrolLeader: members.some((member) => member._id !== current._id && member.patrol === event.target.value && member.isPatrolLeader) ? false : current.isPatrolLeader }))}>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</TextField>
+          <TextField required select label="Instrument" value={editMember?.instrument || ""} onChange={(event) => setEditMember((current) => ({ ...current, instrument: event.target.value }))} helperText={bandInspector ? `Band Inspector is assigned to ${bandInspector.name}.` : "Select the instrument played by this member."}>{INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && Boolean(bandInspector)}>{instrument}{instrument === "Band Inspector" && bandInspector ? " (already assigned)" : ""}</MenuItem>)}</TextField>
+          <TextField select label="Member status" value={editMember?.status || "active"} onChange={(event) => setEditMember((current) => ({ ...current, status: event.target.value }))} helperText={editMember?.status === "inactive" ? "Inactive members are sleeping and cannot sign in." : "Active members can access the member portal."}><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive (sleeping)</MenuItem></TextField>
+          <FormControlLabel control={<Checkbox checked={Boolean(editMember?.isPatrolLeader)} disabled={Boolean(patrolLeader)} onChange={(event) => setEditMember((current) => ({ ...current, isPatrolLeader: event.target.checked }))} />} label="Patrol leader" />
+          {patrolLeader && <Typography variant="caption" color="text.secondary">{editMember?.patrol} is already led by {patrolLeader.name}; this option is unavailable.</Typography>}
         </Stack></DialogContent>
-        <DialogActions><Button color="inherit" onClick={() => setEditMember(null)} disabled={saving}>Cancel</Button><Button variant="contained" onClick={handleSaveMember} disabled={saving || !editMember?.name?.trim()}>{saving ? "Saving..." : "Save changes"}</Button></DialogActions>
+        <DialogActions><Button color="inherit" onClick={() => setEditMember(null)} disabled={saving}>Cancel</Button><Button variant="contained" onClick={handleSaveMember} disabled={saving || !editMember?.name?.trim() || !editMember?.instrument}>{saving ? "Saving..." : "Save changes"}</Button></DialogActions>
       </Dialog>
 
       <ConfirmDialog

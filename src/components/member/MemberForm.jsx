@@ -16,6 +16,7 @@ import {
   MenuItem,
 } from "@mui/material";
 
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import WebcamCapture from "./WebcamCapture";
@@ -26,6 +27,7 @@ import CaptureProgress from "./CaptureProgress";
 import Loader from "../common/Loader";
 
 import useMemberForm from "../../hooks/useMemberForm";
+import { INSTRUMENTS, PATROLS } from "../../constants/memberOptions";
 
 import {
   validateName,
@@ -35,14 +37,27 @@ import {
 } from "../../utils/validators";
 
 export default function MemberForm() {
+  const [members, setMembers] = useState([]);
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     control,
     formState: { errors },
   } = useForm();
   const formValues = useWatch({ control, defaultValue: {} });
+  const patrolHasLeader = useMemo(() => members.some((member) => member.patrol === formValues.patrol && member.isPatrolLeader), [formValues.patrol, members]);
+  const bandInspectorAssigned = useMemo(() => members.some((member) => member.instrument === "Band Inspector"), [members]);
+
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    fetch(`${apiUrl}/members`).then((response) => response.ok ? response.json() : { members: [] }).then((result) => setMembers(result.members || result.data || [])).catch(() => setMembers([]));
+  }, []);
+
+  useEffect(() => {
+    if (patrolHasLeader) setValue("isPatrolLeader", false);
+  }, [patrolHasLeader, setValue]);
 
   const {
     loading,
@@ -118,13 +133,19 @@ export default function MemberForm() {
                   error={!!errors.patrol}
                   helperText={errors.patrol?.message}
                 >
-                  {['Fox', 'Dove', 'Bull', 'Peacock'].map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}
+                  {PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}
                 </TextField>
               </Grid>
 
-              <Grid size={12}>
-                <FormControlLabel control={<Checkbox {...register("isPatrolLeader")} />} label="Patrol leader" />
-                <Typography variant="caption" color="text.secondary" display="block">Only one active member can lead each patrol.</Typography>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth select label="Instrument" defaultValue="" {...register("instrument", { required: "Instrument is required" })} error={!!errors.instrument} helperText={errors.instrument?.message}>
+                  {INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && bandInspectorAssigned}>{instrument}{instrument === "Band Inspector" && bandInspectorAssigned ? " (already assigned)" : ""}</MenuItem>)}
+                </TextField>
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControlLabel control={<Checkbox {...register("isPatrolLeader")} disabled={!formValues.patrol || patrolHasLeader} />} label="Patrol leader" />
+                <Typography variant="caption" color="text.secondary" display="block">{patrolHasLeader ? `${formValues.patrol} already has a patrol leader.` : "Only one member can lead each patrol."}</Typography>
               </Grid>
             </Grid>
 
@@ -163,6 +184,10 @@ export default function MemberForm() {
 
                     <Typography>
                       <strong>Patrol:</strong> {formValues.patrol || "-"}
+                    </Typography>
+
+                    <Typography>
+                      <strong>Instrument:</strong> {formValues.instrument || "-"}
                     </Typography>
 
                     <Typography>
