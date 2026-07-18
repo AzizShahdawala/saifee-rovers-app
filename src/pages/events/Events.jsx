@@ -21,6 +21,7 @@ import {
 } from "../../components/common";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const canEditEvent = (event) => ["active", "upcoming", "ongoing"].includes(getEventStatus(event));
 
 const getCalendarDays = (month) => {
   const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
@@ -257,7 +258,7 @@ const Events = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Edit event">
+          {canEditEvent(event) && <Tooltip title="Edit event">
             <IconButton
               size="small"
               color="primary"
@@ -268,7 +269,7 @@ const Events = () => {
             >
               <EditOutlined fontSize="small" />
             </IconButton>
-          </Tooltip>
+          </Tooltip>}
 
           <Tooltip title="Delete event">
             <IconButton
@@ -335,7 +336,7 @@ const Events = () => {
         emptyIcon={<CalendarMonthOutlined />}
       /> : viewMode === "cards" ? <Grid container spacing={2.5}>{filteredEvents.map((event) => {
         const percentage = event.attendancePercentage ?? (event.attendeeCount && event.capacity ? Math.round((event.attendeeCount / event.capacity) * 100) : 0);
-        return <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={event._id}><Paper sx={{ p: { xs: 2, sm: 2.5 }, height: "100%", border: "1px solid", borderColor: "divider" }}><Stack direction="row" justifyContent="space-between" spacing={2}><Box sx={{ minWidth: 0 }}><Typography variant="overline" color="primary.main" fontWeight={800}>{event.date ? new Date(event.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Date pending"}</Typography><Typography variant="h6" fontWeight={800} sx={{ overflowWrap: "anywhere" }}>{event.title}</Typography></Box><StatusChip status={getEventStatus(event)} /></Stack><Typography color="text.secondary" sx={{ mt: 1 }}>{event.venue || "Venue not specified"}</Typography><Typography variant="body2" sx={{ mt: 2, minHeight: 42 }}>{event.agenda || event.description || "No agenda added."}</Typography><Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}><Typography variant="caption">Attendance</Typography><Typography variant="caption" fontWeight={800}>{percentage}%</Typography></Stack><LinearProgress variant="determinate" value={Math.min(percentage, 100)} sx={{ mt: .5, height: 7, borderRadius: 4 }} /><Stack direction="row" spacing={1} sx={{ mt: 2 }}><Button size="small" onClick={() => navigate(`/events/${event._id}/edit`)}>Edit</Button><Button size="small" color="error" onClick={() => handleDeleteOpen(event)}>Delete</Button></Stack></Paper></Grid>;
+        return <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={event._id}><Paper sx={{ p: { xs: 2, sm: 2.5 }, height: "100%", border: "1px solid", borderColor: "divider" }}><Stack direction="row" justifyContent="space-between" spacing={2}><Box sx={{ minWidth: 0 }}><Typography variant="overline" color="primary.main" fontWeight={800}>{event.date ? new Date(event.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Date pending"}</Typography><Typography variant="h6" fontWeight={800} sx={{ overflowWrap: "anywhere" }}>{event.title}</Typography></Box><StatusChip status={getEventStatus(event)} /></Stack><Typography color="text.secondary" sx={{ mt: 1 }}>{event.venue || "Venue not specified"}</Typography><Typography variant="body2" sx={{ mt: 2, minHeight: 42 }}>{event.agenda || event.description || "No agenda added."}</Typography><Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}><Typography variant="caption">Attendance</Typography><Typography variant="caption" fontWeight={800}>{percentage}%</Typography></Stack><LinearProgress variant="determinate" value={Math.min(percentage, 100)} sx={{ mt: .5, height: 7, borderRadius: 4 }} /><Stack direction="row" spacing={1} sx={{ mt: 2 }}><Button size="small" onClick={() => navigate(`/events/${event._id}/edit`)}>{canEditEvent(event) ? "Edit" : "View"}</Button><Button size="small" color="error" onClick={() => handleDeleteOpen(event)}>Delete</Button></Stack></Paper></Grid>;
       })}</Grid> : <Paper sx={{ overflow: "hidden", border: "1px solid", borderColor: "divider" }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: 2 }}><Button onClick={() => setCalendarMonth((current) => new Date(current.getFullYear(), current.getMonth() - 1, 1))}>Previous</Button><Typography variant="h6" fontWeight={800}>{calendarMonth.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}</Typography><Button onClick={() => setCalendarMonth((current) => new Date(current.getFullYear(), current.getMonth() + 1, 1))}>Next</Button></Stack>
         <Box sx={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}><Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(90px, 1fr))", minWidth: 700 }}>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <Box key={day} sx={{ p: 1, textAlign: "center", bgcolor: "background.default", borderTop: "1px solid", borderBottom: "1px solid", borderColor: "divider" }}><Typography variant="caption" fontWeight={800}>{day}</Typography></Box>)}{getCalendarDays(calendarMonth).map((date) => {
