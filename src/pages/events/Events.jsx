@@ -84,9 +84,9 @@ const Events = () => {
   const [viewMode, setViewMode] = useState("table");
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
 
       const response = await fetch(`${API_URL}/events`);
 
@@ -103,13 +103,14 @@ const Events = () => {
       console.error("Fetch events error:", error);
       setEvents([]);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
     const timeoutId = setTimeout(fetchEvents, 0);
-    return () => clearTimeout(timeoutId);
+    const intervalId = setInterval(() => fetchEvents(false), 30_000);
+    return () => { clearTimeout(timeoutId); clearInterval(intervalId); };
   }, []);
 
   const filteredEvents = useMemo(() => {
