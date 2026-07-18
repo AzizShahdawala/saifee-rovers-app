@@ -365,28 +365,19 @@ const DataTable = ({
                 );
               })}
 
-            {!loading && rows.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length + (selectable ? 1 : 0)}
-                  sx={{
-                    borderBottom: 0,
-                    py: 0,
-                  }}
-                >
-                  <EmptyState
-                    title={emptyTitle}
-                    description={emptyDescription}
-                    icon={emptyIcon}
-                    action={emptyAction}
-                    minHeight={320}
-                  />
-                </TableCell>
-              </TableRow>
-            )}
           </TableBody>
         </Table>
       </TableContainer>
+
+      {!loading && rows.length === 0 && (
+        <EmptyState
+          title={emptyTitle}
+          description={emptyDescription}
+          icon={emptyIcon}
+          action={emptyAction}
+          minHeight={260}
+        />
+      )}
 
       {pagination && !loading && rows.length > 0 && (
         <TablePagination

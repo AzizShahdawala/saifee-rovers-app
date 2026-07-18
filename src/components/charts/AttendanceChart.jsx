@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export default function AttendanceChart({ data = [] }) {
   const values = data.length ? data : [0, 0, 0, 0, 0, 0, 0];
@@ -22,9 +22,9 @@ export default function AttendanceChart({ data = [] }) {
         <polygon points={`0,92 ${points} 100,92`} fill="url(#attendanceFill)" />
         <polyline points={points} fill="none" stroke="#1976d2" strokeWidth="2.2" vectorEffect="non-scaling-stroke" />
       </Box>
-      <Stack direction="row" justifyContent="space-between">
-        {values.map((item, index) => <Typography key={index} variant="caption" color="text.secondary">{item.label || ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][index] || index + 1}</Typography>)}
-      </Stack>
+      <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${values.length}, minmax(0, 1fr))` }}>
+        {values.map((item, index) => <Typography key={index} variant="caption" color="text.secondary" textAlign="center" sx={{ fontSize: { xs: "0.625rem", sm: "0.75rem" }, minWidth: 0 }}>{item.label || ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][index] || index + 1}</Typography>)}
+      </Box>
     </Box>
   );
 }
