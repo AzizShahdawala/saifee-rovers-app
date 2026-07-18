@@ -14,6 +14,8 @@ export const registerMember = (data) => {
   );
 };
 
+export const checkEnrollmentService = () => API.get("/recognition/health", { timeout: 5000 });
+
 export const getMembers = () => {
   return API.get("/members");
 };
