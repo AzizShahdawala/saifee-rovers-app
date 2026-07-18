@@ -25,6 +25,8 @@ export default function useMemberForm() {
 
       formData.append("patrol", data.patrol);
 
+      formData.append("isPatrolLeader", String(Boolean(data.isPatrolLeader)));
+
       for (const pose in capturedImages) {
         const blob = await fetch(capturedImages[pose]).then((r) => r.blob());
 

@@ -11,6 +11,9 @@ import {
   Step,
   StepLabel,
   Box,
+  Checkbox,
+  FormControlLabel,
+  MenuItem,
 } from "@mui/material";
 
 import { useForm, useWatch } from "react-hook-form";
@@ -108,11 +111,20 @@ export default function MemberForm() {
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
-                  label="Patrol Name"
+                  select
+                  label="Patrol"
+                  defaultValue=""
                   {...register("patrol", validatePatrol)}
                   error={!!errors.patrol}
                   helperText={errors.patrol?.message}
-                />
+                >
+                  {['Fox', 'Dove', 'Bull', 'Peacock'].map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}
+                </TextField>
+              </Grid>
+
+              <Grid size={12}>
+                <FormControlLabel control={<Checkbox {...register("isPatrolLeader")} />} label="Patrol leader" />
+                <Typography variant="caption" color="text.secondary" display="block">Only one active member can lead each patrol.</Typography>
               </Grid>
             </Grid>
 
@@ -151,6 +163,10 @@ export default function MemberForm() {
 
                     <Typography>
                       <strong>Patrol:</strong> {formValues.patrol || "-"}
+                    </Typography>
+
+                    <Typography>
+                      <strong>Role:</strong> {formValues.isPatrolLeader ? "Patrol leader" : "Patrol member"}
                     </Typography>
                   </CardContent>
                 </Card>

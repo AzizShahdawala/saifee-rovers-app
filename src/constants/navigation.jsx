@@ -1,6 +1,5 @@
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import EventIcon from "@mui/icons-material/Event";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
@@ -17,11 +16,6 @@ const navigation = [
     title: "Members",
     icon: PeopleAltIcon,
     path: "/members",
-  },
-  {
-    title: "Register Member",
-    icon: PersonAddAlt1Icon,
-    path: "/members/add",
   },
   {
     title: "Events",
