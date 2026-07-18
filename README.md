@@ -21,6 +21,9 @@ npm install
 npm run dev
 ```
 
+Open `http://localhost:5173/`. The GitHub Pages subdirectory is applied only
+during the Actions deployment build, so local development continues to use `/`.
+
 The frontend uses `http://localhost:5000/api` by default. To connect another backend, create a `.env.local` file:
 
 ```env
