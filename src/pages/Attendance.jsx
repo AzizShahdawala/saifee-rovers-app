@@ -4,13 +4,14 @@ import {
   Alert, Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   FormControl, Grid, InputLabel, LinearProgress, MenuItem, Paper, Select, Stack, Typography,
 } from "@mui/material";
-import { CameraAltOutlined, CheckCircleOutlined, PersonAddOutlined, RestartAltOutlined } from "@mui/icons-material";
+import { CameraAltOutlined, CheckCircleOutlined, FullscreenOutlined, PersonAddOutlined, RestartAltOutlined } from "@mui/icons-material";
 import { DataTable, PageHeader, StatusChip } from "../components/common";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function Attendance() {
   const cameraRef = useRef(null);
+  const scannerSectionRef = useRef(null);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
@@ -67,8 +68,8 @@ export default function Attendance() {
 
   return (
     <Box>
-      <PageHeader title="Attendance Scanner" subtitle="Live face recognition with instant attendance and manual override." actionLabel="Manual Attendance" actionIcon={<PersonAddOutlined />} onAction={() => setManualOpen(true)} />
-      <Grid container spacing={2.5}>
+      <PageHeader title="Attendance Scanner" subtitle="Live face recognition with instant attendance and manual override." actions={<Stack direction="row" spacing={1}><Button variant="outlined" startIcon={<FullscreenOutlined />} onClick={() => scannerSectionRef.current?.requestFullscreen?.()}>Full screen</Button><Button variant="contained" startIcon={<PersonAddOutlined />} onClick={() => setManualOpen(true)}>Manual Attendance</Button></Stack>} />
+      <Grid ref={scannerSectionRef} container spacing={2.5} sx={{ bgcolor: "background.default" }}>
         <Grid item xs={12} lg={8}>
           <Paper sx={{ overflow: "hidden", bgcolor: "#06111f", position: "relative", minHeight: { xs: 320, md: 520 } }}>
             {cameraEnabled ? <Webcam ref={cameraRef} audio={false} screenshotFormat="image/jpeg" videoConstraints={{ facingMode: "user" }} style={{ width: "100%", height: "100%", minHeight: 520, objectFit: "cover", display: "block" }} /> : <Box sx={{ minHeight: 520, display: "grid", placeItems: "center", color: "white" }}><Typography>Camera paused</Typography></Box>}

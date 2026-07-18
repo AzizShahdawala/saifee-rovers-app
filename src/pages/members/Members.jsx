@@ -99,18 +99,19 @@ const Members = () => {
   const patrols = [...new Set(members.map((member) => member.patrol).filter(Boolean))];
 
   const handleSaveMember = async () => {
-    if (!editMember?._id || !editMember.name?.trim()) return;
+    if (!editMember?.name?.trim()) return;
     setSaving(true);
     try {
-      const response = await fetch(`${API_URL}/members/${editMember._id}`, {
-        method: "PUT",
+      const isEditing = Boolean(editMember._id);
+      const response = await fetch(`${API_URL}/members${isEditing ? `/${editMember._id}` : ""}`, {
+        method: isEditing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editMember),
       });
       if (!response.ok) throw new Error("Unable to update member");
       const result = await response.json();
       const updated = result.member || result.data || { ...editMember };
-      setMembers((current) => current.map((member) => member._id === editMember._id ? { ...member, ...updated } : member));
+      setMembers((current) => isEditing ? current.map((member) => member._id === editMember._id ? { ...member, ...updated } : member) : [updated, ...current]);
       setEditMember(null);
     } catch (error) {
       console.error("Update member error:", error);
@@ -250,7 +251,7 @@ const Members = () => {
               size="small"
               onClick={(event) => {
                 event.stopPropagation();
-                navigate(`/members/${member._id}`);
+                setEditMember({ ...member });
               }}
             >
               <VisibilityOutlined fontSize="small" />
@@ -303,7 +304,7 @@ const Members = () => {
         ]}
         actionLabel="Add Member"
         actionIcon={<PersonAddAlt1 />}
-        onAction={() => navigate("/members/add")}
+        onAction={() => setEditMember({ name: "", email: "", phone: "", patrol: "", status: "active" })}
       />
 
       <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mb: 2.5 }}>
@@ -316,6 +317,7 @@ const Members = () => {
         </Box>
         <FormControl size="small" sx={{ minWidth: 160 }}><InputLabel>Patrol</InputLabel><Select value={patrolFilter} label="Patrol" onChange={(event) => setPatrolFilter(event.target.value)}><MenuItem value="all">All patrols</MenuItem>{patrols.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</Select></FormControl>
         <FormControl size="small" sx={{ minWidth: 150 }}><InputLabel>Status</InputLabel><Select value={statusFilter} label="Status" onChange={(event) => setStatusFilter(event.target.value)}><MenuItem value="all">All statuses</MenuItem><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive</MenuItem></Select></FormControl>
+        <Button variant="outlined" startIcon={<PersonAddAlt1 />} onClick={() => navigate("/members/add")} sx={{ whiteSpace: "nowrap" }}>Face Enrollment</Button>
       </Stack>
 
       <DataTable
@@ -338,7 +340,7 @@ const Members = () => {
             <Box
               component="button"
               type="button"
-              onClick={() => navigate("/members/add")}
+              onClick={() => setEditMember({ name: "", email: "", phone: "", patrol: "", status: "active" })}
               sx={{
                 mt: 1,
                 px: 2,
@@ -358,7 +360,7 @@ const Members = () => {
       />
 
       <Dialog open={Boolean(editMember)} onClose={() => !saving && setEditMember(null)} fullWidth maxWidth="sm">
-        <DialogTitle>Edit member</DialogTitle>
+        <DialogTitle>{editMember?._id ? "Edit member" : "Add member"}</DialogTitle>
         <DialogContent><Stack spacing={2} sx={{ pt: 1 }}>
           <TextField label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
           <TextField label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />

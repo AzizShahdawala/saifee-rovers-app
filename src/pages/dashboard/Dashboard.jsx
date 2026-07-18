@@ -308,7 +308,7 @@ const Dashboard = () => {
                 {dashboardData.upcomingEvents.map((event) => (
                   <Box
                     key={event._id}
-                    onClick={() => navigate(`/events/${event._id}`)}
+                    onClick={() => navigate(`/events/${event._id}/edit`)}
                     sx={{
                       p: 1.75,
                       borderRadius: 2,

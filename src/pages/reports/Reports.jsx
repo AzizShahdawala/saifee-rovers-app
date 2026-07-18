@@ -168,7 +168,7 @@ const Reports = () => {
   ];
 
   return (
-    <Box>
+    <Box className="reports-page">
       <PageHeader
         title="Attendance Reports"
         subtitle="Review member attendance records and export event reports."

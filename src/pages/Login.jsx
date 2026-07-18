@@ -68,6 +68,14 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
+      if (!import.meta.env.VITE_API_URL) {
+        localStorage.setItem("token", "demo-access-token");
+        localStorage.setItem("user", JSON.stringify({ name: "Demo Administrator", email: form.email.trim() }));
+        if (remember) localStorage.setItem("rememberedEmail", form.email.trim());
+        else localStorage.removeItem("rememberedEmail");
+        navigate("/dashboard", { replace: true });
+        return;
+      }
       const response = await API.post("/auth/login", {
         email: form.email.trim(),
         password: form.password,

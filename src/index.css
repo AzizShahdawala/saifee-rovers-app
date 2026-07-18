@@ -109,3 +109,27 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .reports-page,
+  .reports-page * {
+    visibility: visible;
+  }
+
+  .reports-page {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    background: #fff;
+  }
+
+  .MuiDrawer-root,
+  .MuiAppBar-root,
+  footer,
+  button {
+    display: none !important;
+  }
+}

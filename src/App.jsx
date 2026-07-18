@@ -8,6 +8,7 @@ import Events from "./pages/events/Events";
 import CreateEvent from "./pages/CreateEvent";
 import Attendance from "./pages/Attendance";
 import Reports from "./pages/reports/Reports";
+import UtilityPage from "./pages/UtilityPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -32,6 +33,9 @@ function App() {
         <Route path="/events/:id/edit" element={<CreateEvent />} />
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/profile" element={<UtilityPage />} />
+        <Route path="/settings" element={<UtilityPage />} />
+        <Route path="/notifications" element={<UtilityPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
