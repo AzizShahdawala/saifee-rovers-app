@@ -1,16 +1,40 @@
-# React + Vite
+# Saifee Rovers Attendance
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Responsive member, event, face-enrollment, attendance, and reporting application built with React, Vite, and Material UI.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Responsive authenticated dashboard and navigation
+- Member registration, editing, filtering, and face enrollment
+- Event list, card, and calendar views
+- Camera-based attendance scanner and manual override
+- Attendance analytics with Excel and print-to-PDF export
+- Automated GitHub Pages deployment
 
-## React Compiler
+## Local development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+The frontend uses `http://localhost:5000/api` by default. To connect another backend, create a `.env.local` file:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```env
+VITE_API_URL=https://your-api.example.com/api
+```
+
+## Quality checks
+
+```bash
+npm run lint
+npm run build
+```
+
+## Deployment
+
+Pushes to `main` are built and deployed by `.github/workflows/deploy-pages.yml`.
+
+Live site: https://azizshahdawala.github.io/saifee-rovers-app/
+
+For production API connectivity, configure the repository Actions variable `VITE_API_URL`.
