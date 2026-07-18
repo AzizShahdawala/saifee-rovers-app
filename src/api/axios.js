@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearSession } from "../utils/auth";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
@@ -21,9 +22,8 @@ API.interceptors.response.use(
 
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-
-      window.location.href = "/";
+      clearSession();
+      window.location.hash = "#/";
     }
 
     return Promise.reject(error);

@@ -1,10 +1,13 @@
 # Saifee Rovers Attendance
 
-Responsive member, event, face-enrollment, attendance, and reporting application built with React, Vite, and Material UI.
+Responsive administration and member portal built with React, Vite, and Material UI.
 
 ## Features
 
 - Responsive authenticated dashboard and navigation
+- Separate administrator and member authentication flows
+- OTP-based first-time member password setup
+- Member dashboard, attendance history, events, and profile
 - Member registration, editing, filtering, and face enrollment
 - Event list, card, and calendar views
 - Camera-based attendance scanner and manual override

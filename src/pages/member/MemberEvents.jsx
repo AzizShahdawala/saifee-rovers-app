@@ -1,0 +1,11 @@
+import { useEffect, useState } from "react";
+import { Alert, Box, Card, CardContent, Chip, CircularProgress, Grid, Stack, Typography } from "@mui/material";
+import { CalendarMonthOutlined, LocationOnOutlined, ScheduleOutlined } from "@mui/icons-material";
+import { getMemberEvents } from "../../services/memberPortalService";
+
+const displayDate = (value) => new Date(value).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
+export default function MemberEvents() {
+  const [data, setData] = useState(null); const [error, setError] = useState("");
+  useEffect(() => { getMemberEvents().then(({ data: result }) => setData(result)).catch((e) => setError(e.response?.data?.message || "Could not load events")); }, []);
+  return <Stack spacing={3}><Box><Typography variant="h4" fontWeight={900}>Events</Typography><Typography color="text.secondary">Upcoming activities and events you have attended.</Typography></Box>{error && <Alert severity="error">{error}</Alert>}{!data && !error ? <CircularProgress /> : <><Typography variant="h6" fontWeight={800}>Upcoming</Typography><Grid container spacing={2}>{data?.upcomingEvents?.length ? data.upcomingEvents.map((event) => <Grid key={event._id} size={{ xs: 12, md: 6, xl: 4 }}><Card sx={{ height: "100%" }}><CardContent><Stack spacing={1.25}><Stack direction="row" justifyContent="space-between"><Chip label={event.status} color="primary" size="small" /><CalendarMonthOutlined color="primary" /></Stack><Typography variant="h6" fontWeight={800}>{event.title}</Typography><Typography color="text.secondary"><ScheduleOutlined fontSize="inherit" /> {displayDate(event.date)} · {event.startTime || "Time TBA"}</Typography><Typography color="text.secondary"><LocationOnOutlined fontSize="inherit" /> {event.venue || "Venue TBA"}</Typography>{event.agenda && <Typography variant="body2">{event.agenda}</Typography>}</Stack></CardContent></Card></Grid>) : <Grid size={12}><Alert severity="info">No upcoming events are scheduled.</Alert></Grid>}</Grid><Typography variant="h6" fontWeight={800}>Previously attended</Typography><Typography color="text.secondary">You have {data?.attendedEvents?.length || 0} attendance record(s).</Typography></>}</Stack>;
+}

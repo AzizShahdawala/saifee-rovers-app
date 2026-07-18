@@ -1,227 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import {
-  Alert,
-  Box,
-  Button,
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  Link,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import {
-  ArrowForwardOutlined,
-  LockOutlined,
-  MailOutlined,
-  VisibilityOffOutlined,
-  VisibilityOutlined,
-} from "@mui/icons-material";
-
+import { Alert, Box, Button, Checkbox, CircularProgress, FormControlLabel, IconButton, InputAdornment, Paper, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { ArrowBackOutlined, ArrowForwardOutlined, LockOutlined, MailOutlined, PhoneOutlined, VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import API from "../api/axios";
+import { loginMember, requestMemberOtp, setMemberPassword } from "../services/memberPortalService";
+import { getStoredUser, homeForRole, saveSession } from "../utils/auth";
 import logo from "../assets/logo.png";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const messageOf = (error, fallback) => error.response?.data?.message || error.message || fallback;
 
 export default function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState(() => ({
-    email: localStorage.getItem("rememberedEmail") || "",
-    password: "",
-  }));
-  const [remember, setRemember] = useState(
-    Boolean(localStorage.getItem("rememberedEmail")),
-  );
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [errors, setErrors] = useState({});
-
-  const updateField = (field) => (event) => {
-    setForm((current) => ({ ...current, [field]: event.target.value }));
-    setErrors((current) => ({ ...current, [field]: "" }));
-    setError("");
-  };
-
-  const validate = () => {
-    const nextErrors = {};
-    if (!emailPattern.test(form.email.trim())) {
-      nextErrors.email = "Enter a valid email address";
-    }
-    if (form.password.length < 6) {
-      nextErrors.password = "Password must be at least 6 characters";
-    }
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!validate()) return;
-
-    setLoading(true);
-    setError("");
-    try {
-      if (!import.meta.env.VITE_API_URL) {
-        localStorage.setItem("token", "demo-access-token");
-        localStorage.setItem("user", JSON.stringify({ name: "Demo Administrator", email: form.email.trim() }));
-        if (remember) localStorage.setItem("rememberedEmail", form.email.trim());
-        else localStorage.removeItem("rememberedEmail");
-        navigate("/dashboard", { replace: true });
-        return;
-      }
-      const response = await API.post("/auth/login", {
-        email: form.email.trim(),
-        password: form.password,
-      });
-      const token = response.data?.token || response.data?.accessToken;
-      if (!token) throw new Error("The server did not return an access token.");
-      localStorage.setItem("token", token);
-      if (response.data?.user) {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-      }
-      if (remember) localStorage.setItem("rememberedEmail", form.email.trim());
-      else localStorage.removeItem("rememberedEmail");
-      navigate("/dashboard", { replace: true });
-    } catch (requestError) {
-      setError(
-        requestError.response?.data?.message ||
-          requestError.message ||
-          "Unable to sign in. Check your credentials and try again.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        position: "relative",
-        overflow: "hidden",
-        p: 2,
-        background:
-          "linear-gradient(135deg, #071a33 0%, #0b4b73 48%, #1ca6a0 100%)",
-        "@keyframes float": {
-          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
-          "50%": { transform: "translate3d(20px, -28px, 0) scale(1.08)" },
-        },
-      }}
-    >
-      {[{ top: "-12%", left: "-6%", size: 360, delay: "0s" }, { bottom: "-16%", right: "-5%", size: 440, delay: "-3s" }, { top: "18%", right: "16%", size: 160, delay: "-5s" }].map((orb, index) => (
-        <Box
-          key={index}
-          sx={{
-            position: "absolute",
-            top: orb.top,
-            bottom: orb.bottom,
-            left: orb.left,
-            right: orb.right,
-            width: orb.size,
-            height: orb.size,
-            borderRadius: "50%",
-            bgcolor: "rgba(255,255,255,.10)",
-            filter: "blur(2px)",
-            animation: "float 8s ease-in-out infinite",
-            animationDelay: orb.delay,
-          }}
-        />
-      ))}
-
-      <Paper
-        component="form"
-        onSubmit={handleSubmit}
-        elevation={0}
-        sx={{
-          position: "relative",
-          width: "100%",
-          maxWidth: 460,
-          p: { xs: 2.5, sm: 5 },
-          border: "1px solid rgba(255,255,255,.35)",
-          bgcolor: "rgba(255,255,255,.86)",
-          backdropFilter: "blur(22px)",
-          boxShadow: "0 28px 80px rgba(0,20,45,.34)",
-        }}
-      >
-        <Stack spacing={3}>
-          <Stack alignItems="center" spacing={1.25}>
-            <Box component="img" src={logo} alt="Saifee Rovers" sx={{ width: 72, height: 72, objectFit: "contain" }} />
-            <Typography variant="h4" fontWeight={800} textAlign="center">
-              Welcome back
-            </Typography>
-            <Typography color="text.secondary" textAlign="center">
-              Sign in to manage members, events, and attendance.
-            </Typography>
-          </Stack>
-
-          {error && <Alert severity="error">{error}</Alert>}
-
-          <TextField
-            label="Email address"
-            value={form.email}
-            onChange={updateField("email")}
-            error={Boolean(errors.email)}
-            helperText={errors.email}
-            autoComplete="email"
-            autoFocus
-            InputProps={{
-              startAdornment: <InputAdornment position="start"><MailOutlined color="action" /></InputAdornment>,
-            }}
-          />
-          <TextField
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            value={form.password}
-            onChange={updateField("password")}
-            error={Boolean(errors.password)}
-            helperText={errors.password}
-            autoComplete="current-password"
-            InputProps={{
-              startAdornment: <InputAdornment position="start"><LockOutlined color="action" /></InputAdornment>,
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword((visible) => !visible)} edge="end" aria-label="Toggle password visibility">
-                    {showPassword ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "flex-start", sm: "center" }} justifyContent="space-between" spacing={{ xs: 0.5, sm: 0 }}>
-            <FormControlLabel
-              control={<Checkbox checked={remember} onChange={(event) => setRemember(event.target.checked)} />}
-              label="Remember me"
-            />
-            <Link component="button" type="button" underline="hover" fontWeight={600}>
-              Forgot password?
-            </Link>
-          </Stack>
-
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            disabled={loading}
-            endIcon={!loading && <ArrowForwardOutlined />}
-            sx={{ minHeight: 52 }}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Sign in"}
-          </Button>
-          <Typography variant="caption" color="text.secondary" textAlign="center">
-            Secure JWT-ready administrator access
-          </Typography>
-        </Stack>
-      </Paper>
-    </Box>
-  );
+  const [type, setType] = useState("admin");
+  const [form, setForm] = useState({ email: localStorage.getItem("rememberedEmail") || "", password: "", phone: "", otp: "", confirmPassword: "" });
+  const [remember, setRemember] = useState(Boolean(localStorage.getItem("rememberedEmail")));
+  const [showPassword, setShowPassword] = useState(false); const [loading, setLoading] = useState(false); const [error, setError] = useState(""); const [notice, setNotice] = useState(""); const [setupStep, setSetupStep] = useState(0);
+  useEffect(() => { if (localStorage.getItem("token")) navigate(homeForRole(getStoredUser()?.role), { replace: true }); }, [navigate]);
+  const update = (key) => (event) => { setForm((current) => ({ ...current, [key]: event.target.value })); setError(""); };
+  const validCredentials = () => { if (!emailPattern.test(form.email.trim())) return setError("Enter a valid email address"), false; if (form.password.length < (type === "member" ? 8 : 6)) return setError(`Password must be at least ${type === "member" ? 8 : 6} characters`), false; return true; };
+  const submit = async (event) => { event.preventDefault(); if (!validCredentials()) return; setLoading(true); setError(""); try { const response = type === "member" ? await loginMember({ email: form.email.trim(), password: form.password }) : await API.post("/auth/login", { email: form.email.trim(), password: form.password }); if (!response.data?.token) throw new Error("The server did not return an access token"); saveSession(response.data); if (remember) localStorage.setItem("rememberedEmail", form.email.trim()); else localStorage.removeItem("rememberedEmail"); navigate(homeForRole(response.data.user?.role), { replace: true }); } catch (e) { setError(messageOf(e, "Unable to sign in")); } finally { setLoading(false); } };
+  const requestOtp = async () => { if (!emailPattern.test(form.email.trim()) || !form.phone.trim()) return setError("Enter your registered email and phone number"); setLoading(true); setError(""); try { const { data } = await requestMemberOtp({ email: form.email.trim(), phone: form.phone }); setNotice(data.message); if (data.developmentOtp) setForm((current) => ({ ...current, otp: data.developmentOtp })); setSetupStep(2); } catch (e) { setError(messageOf(e, "Could not request a verification code")); } finally { setLoading(false); } };
+  const finishSetup = async () => { if (!/^\d{6}$/.test(form.otp)) return setError("Enter the six-digit verification code"); if (form.password.length < 8) return setError("Password must be at least 8 characters"); if (form.password !== form.confirmPassword) return setError("Passwords do not match"); setLoading(true); setError(""); try { const { data } = await setMemberPassword({ email: form.email.trim(), phone: form.phone, otp: form.otp, password: form.password }); setNotice(data.message); setSetupStep(0); setForm((current) => ({ ...current, otp: "", confirmPassword: "" })); } catch (e) { setError(messageOf(e, "Could not set your password")); } finally { setLoading(false); } };
+  const changeType = (_, next) => { setType(next); setSetupStep(0); setError(""); setNotice(""); setForm((current) => ({ ...current, password: "", phone: "", otp: "", confirmPassword: "" })); };
+  return <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", position: "relative", overflow: "hidden", p: 2, background: "linear-gradient(135deg,#071a33 0%,#0b4b73 50%,#1ca6a0 100%)", "@keyframes float": { "50%": { transform: "translateY(-24px) scale(1.06)" } } }}>
+    {[{ top: "-12%", left: "-6%", size: 360 }, { bottom: "-16%", right: "-5%", size: 440 }].map((orb, i) => <Box key={i} sx={{ position: "absolute", ...orb, width: orb.size, height: orb.size, borderRadius: "50%", bgcolor: "rgba(255,255,255,.1)", animation: "float 8s ease-in-out infinite" }} />)}
+    <Paper component={setupStep ? "div" : "form"} onSubmit={submit} elevation={0} sx={{ position: "relative", width: "100%", maxWidth: 480, p: { xs: 2.5, sm: 4.5 }, border: "1px solid rgba(255,255,255,.35)", bgcolor: "rgba(255,255,255,.9)", backdropFilter: "blur(22px)", boxShadow: "0 28px 80px rgba(0,20,45,.34)" }}><Stack spacing={2.5}>
+      <Stack alignItems="center" spacing={1}><Box component="img" src={logo} alt="Saifee Rovers" sx={{ width: 68, height: 68, objectFit: "contain" }} /><Typography variant="h4" fontWeight={900} textAlign="center">{setupStep ? "Activate member access" : "Welcome back"}</Typography><Typography color="text.secondary" textAlign="center">{setupStep ? "Verify your membership and create a secure password." : "Choose your account type to continue."}</Typography></Stack>
+      {!setupStep && <Tabs value={type} onChange={changeType} variant="fullWidth" aria-label="Account type"><Tab value="admin" label="Administrator" /><Tab value="member" label="Member" /></Tabs>}
+      {error && <Alert severity="error">{error}</Alert>}{notice && <Alert severity="success">{notice}</Alert>}
+      {setupStep === 1 ? <><TextField label="Registered email" value={form.email} onChange={update("email")} autoComplete="email" InputProps={{ startAdornment: <InputAdornment position="start"><MailOutlined /></InputAdornment> }} /><TextField label="Registered phone number" value={form.phone} onChange={update("phone")} autoComplete="tel" InputProps={{ startAdornment: <InputAdornment position="start"><PhoneOutlined /></InputAdornment> }} /><Button variant="contained" size="large" onClick={requestOtp} disabled={loading}>{loading ? <CircularProgress size={24} color="inherit" /> : "Send verification code"}</Button><Button startIcon={<ArrowBackOutlined />} onClick={() => setSetupStep(0)}>Back to sign in</Button></> : setupStep === 2 ? <><TextField label="Six-digit verification code" value={form.otp} onChange={update("otp")} inputProps={{ inputMode: "numeric", maxLength: 6 }} /><PasswordField label="Create password" value={form.password} onChange={update("password")} visible={showPassword} toggle={() => setShowPassword((v) => !v)} /><TextField label="Confirm password" type={showPassword ? "text" : "password"} value={form.confirmPassword} onChange={update("confirmPassword")} /><Button variant="contained" size="large" onClick={finishSetup} disabled={loading}>{loading ? <CircularProgress size={24} color="inherit" /> : "Set password"}</Button><Button onClick={() => setSetupStep(1)}>Request another code</Button></> : <><TextField label="Email address" value={form.email} onChange={update("email")} autoComplete="email" autoFocus InputProps={{ startAdornment: <InputAdornment position="start"><MailOutlined /></InputAdornment> }} /><PasswordField label="Password" value={form.password} onChange={update("password")} visible={showPassword} toggle={() => setShowPassword((v) => !v)} /><FormControlLabel control={<Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)} />} label="Remember email" /><Button type="submit" variant="contained" size="large" disabled={loading} endIcon={!loading && <ArrowForwardOutlined />}>{loading ? <CircularProgress size={24} color="inherit" /> : `Sign in as ${type}`}</Button>{type === "member" && <Button type="button" onClick={() => setSetupStep(1)}>First time here? Set your password</Button>}</>}
+    </Stack></Paper>
+  </Box>;
 }
+
+function PasswordField({ label, value, onChange, visible, toggle }) { return <TextField label={label} type={visible ? "text" : "password"} value={value} onChange={onChange} autoComplete="current-password" InputProps={{ startAdornment: <InputAdornment position="start"><LockOutlined /></InputAdornment>, endAdornment: <InputAdornment position="end"><IconButton onClick={toggle} edge="end" aria-label="Toggle password visibility">{visible ? <VisibilityOffOutlined /> : <VisibilityOutlined />}</IconButton></InputAdornment> }} />; }

@@ -12,6 +12,11 @@ import UtilityPage from "./pages/UtilityPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
+import MemberLayout from "./layouts/MemberLayout";
+import MemberDashboard from "./pages/member/MemberDashboard";
+import MemberAttendance from "./pages/member/MemberAttendance";
+import MemberEvents from "./pages/member/MemberEvents";
+import MemberProfile from "./pages/member/MemberProfile";
 
 function App() {
   return (
@@ -20,7 +25,7 @@ function App() {
 
       <Route
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="admin">
             <DashboardLayout />
           </ProtectedRoute>
         }
@@ -36,6 +41,13 @@ function App() {
         <Route path="/profile" element={<UtilityPage />} />
         <Route path="/settings" element={<UtilityPage />} />
         <Route path="/notifications" element={<UtilityPage />} />
+      </Route>
+
+      <Route element={<ProtectedRoute role="member"><MemberLayout /></ProtectedRoute>}>
+        <Route path="/member" element={<MemberDashboard />} />
+        <Route path="/member/attendance" element={<MemberAttendance />} />
+        <Route path="/member/events" element={<MemberEvents />} />
+        <Route path="/member/profile" element={<MemberProfile />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
