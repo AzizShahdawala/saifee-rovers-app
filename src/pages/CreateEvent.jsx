@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Alert, Box, Button, Grid, MenuItem, Paper, Stack, TextField } from "@mui/material";
-import { SaveOutlined } from "@mui/icons-material";
-import { PageHeader } from "../components/common";
+import { Alert, Box, Button, CircularProgress, Divider, Grid, MenuItem, Paper, Stack, TextField, Typography } from "@mui/material";
+import { CalendarMonthOutlined, GroupsOutlined, LocationOnOutlined, SaveOutlined, ScheduleOutlined, SubjectOutlined } from "@mui/icons-material";
+import { PageHeader, StatusChip } from "../components/common";
+import EventMediaGallery from "../components/events/EventMediaGallery";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const initialForm = { title: "", date: "", startTime: "", endTime: "", venue: "", agenda: "", capacity: "", status: "upcoming" };
@@ -41,6 +42,23 @@ export default function CreateEvent() {
     } catch (requestError) { setError(requestError.message); } finally { setSaving(false); }
   };
 
+  if (loadingEvent) return <Box sx={{ minHeight: 360, display: "grid", placeItems: "center" }}><CircularProgress /></Box>;
+
+  if (readOnly) return <Box>
+    <PageHeader title="View Event" subtitle="Review the event schedule, venue, agenda, and shared memories." backPath="/events" />
+    <Stack spacing={2.5}>
+      <Alert severity={form.status === "completed" ? "success" : "warning"}>This event is {form.status} and its details are read-only.</Alert>
+      <Paper sx={{ p: { xs: 2.5, md: 4 }, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ sm: "flex-start" }} spacing={2}><Box sx={{ minWidth: 0 }}><Typography variant="overline" color="primary.main" fontWeight={900}>Event details</Typography><Typography variant="h4" fontWeight={900} sx={{ overflowWrap: "anywhere" }}>{form.title}</Typography></Box><StatusChip status={form.status} /></Stack>
+        <Divider sx={{ my: 3 }} />
+        <Grid container spacing={2}><Detail icon={<CalendarMonthOutlined />} label="Date" value={form.date ? new Date(`${form.date}T00:00:00`).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : "Not set"} /><Detail icon={<ScheduleOutlined />} label="Time" value={`${form.startTime || "Not set"}${form.endTime ? ` – ${form.endTime}` : ""}`} /><Detail icon={<LocationOnOutlined />} label="Venue" value={form.venue || "Not set"} /><Detail icon={<GroupsOutlined />} label="Capacity" value={form.capacity || "Not set"} /></Grid>
+        <Divider sx={{ my: 3 }} /><Stack direction="row" spacing={1.5} alignItems="flex-start"><SubjectOutlined color="primary" /><Box><Typography variant="caption" color="text.secondary" textTransform="uppercase" fontWeight={800}>Agenda</Typography><Typography sx={{ mt: .5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{form.agenda || "No agenda was added."}</Typography></Box></Stack>
+      </Paper>
+      {form.status === "completed" && <Paper sx={{ p: { xs: 2.5, md: 4 }, border: "1px solid", borderColor: "divider" }}><EventMediaGallery eventId={id} canUpload /></Paper>}
+      <Box><Button color="inherit" onClick={() => navigate("/events")}>Back to events</Button></Box>
+    </Stack>
+  </Box>;
+
   return (
     <Box>
       <PageHeader title={readOnly ? "View Event" : id ? "Edit Event" : "Create Event"} subtitle={readOnly ? "Completed and cancelled events are retained as read-only records." : "Schedule the agenda, venue, capacity, and attendance window."} backPath="/events" />
@@ -64,3 +82,5 @@ export default function CreateEvent() {
     </Box>
   );
 }
+
+function Detail({ icon, label, value }) { return <Grid size={{ xs: 12, sm: 6 }}><Stack direction="row" spacing={1.5} sx={{ p: 2, borderRadius: 2, bgcolor: "background.default", height: "100%" }}><Box color="primary.main">{icon}</Box><Box sx={{ minWidth: 0 }}><Typography variant="caption" color="text.secondary" textTransform="uppercase" fontWeight={800}>{label}</Typography><Typography fontWeight={700} sx={{ overflowWrap: "anywhere" }}>{value}</Typography></Box></Stack></Grid>; }
