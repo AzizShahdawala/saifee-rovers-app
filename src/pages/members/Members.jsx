@@ -54,6 +54,9 @@ const Members = () => {
   const [patrolFilter, setPatrolFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [editMember, setEditMember] = useState(null);
+  const [originalMember, setOriginalMember] = useState(null);
+  const [dialogMode, setDialogMode] = useState("edit");
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
 
@@ -103,6 +106,38 @@ const Members = () => {
 
   const patrolLeader = editMember ? members.find((member) => member._id !== editMember._id && member.patrol === editMember.patrol && member.isPatrolLeader) : null;
   const bandInspector = editMember ? members.find((member) => member._id !== editMember._id && member.instrument === "Band Inspector") : null;
+  const memberChanges = useMemo(() => {
+    if (!editMember || !originalMember) return [];
+    const fields = [
+      ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["patrol", "Patrol"],
+      ["instrument", "Instrument"], ["status", "Member status"], ["isPatrolLeader", "Patrol leader"],
+    ];
+    const display = (key, value) => key === "isPatrolLeader" ? (value ? "Yes" : "No") : String(value || "Not set");
+    return fields.filter(([key]) => (editMember[key] ?? "") !== (originalMember[key] ?? "")).map(([key, label]) => ({ key, label, before: display(key, originalMember[key]), after: display(key, editMember[key]) }));
+  }, [editMember, originalMember]);
+
+  const openMember = (member, mode) => {
+    setSaveError("");
+    setDialogMode(mode);
+    setOriginalMember({ ...member });
+    setEditMember({ ...member });
+  };
+
+  const closeMember = () => {
+    if (saving) return;
+    setReviewOpen(false);
+    setEditMember(null);
+    setOriginalMember(null);
+  };
+
+  const requestSaveConfirmation = () => {
+    if (!memberChanges.length) {
+      setSaveError("No member details have been changed.");
+      return;
+    }
+    setSaveError("");
+    setReviewOpen(true);
+  };
 
   const handleSaveMember = async () => {
     if (!editMember?.name?.trim()) return;
@@ -113,13 +148,15 @@ const Members = () => {
       const response = await fetch(`${API_URL}/members${isEditing ? `/${editMember._id}` : ""}`, {
         method: isEditing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editMember),
+        body: JSON.stringify({ ...editMember, expectedUpdatedAt: originalMember?.updatedAt }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Unable to update member");
       const updated = result.member || result.data || { ...editMember };
       setMembers((current) => isEditing ? current.map((member) => member._id === editMember._id ? { ...member, ...updated } : member) : [updated, ...current]);
+      setReviewOpen(false);
       setEditMember(null);
+      setOriginalMember(null);
     } catch (error) {
       console.error("Update member error:", error);
       setSaveError(error.message);
@@ -272,7 +309,7 @@ const Members = () => {
               size="small"
               onClick={(event) => {
                 event.stopPropagation();
-                setSaveError(""); setEditMember({ ...member });
+                openMember(member, "view");
               }}
             >
               <VisibilityOutlined fontSize="small" />
@@ -285,7 +322,7 @@ const Members = () => {
               color="primary"
               onClick={(event) => {
                 event.stopPropagation();
-                setSaveError(""); setEditMember({ ...member });
+                openMember(member, "edit");
               }}
             >
               <EditOutlined fontSize="small" />
@@ -379,20 +416,27 @@ const Members = () => {
         }
       />
 
-      <Dialog open={Boolean(editMember)} onClose={() => !saving && setEditMember(null)} fullWidth maxWidth="sm">
-        <DialogTitle>Edit member</DialogTitle>
+      <Dialog open={Boolean(editMember)} onClose={closeMember} fullWidth maxWidth="sm">
+        <DialogTitle>{dialogMode === "view" ? "View member" : "Edit member"}</DialogTitle>
         <DialogContent><Stack spacing={2} sx={{ pt: 1 }}>
+          <Stack alignItems="center" spacing={1} sx={{ pb: 1 }}><Avatar src={editMember?.profileImage || editMember?.imageUrl || undefined} alt={editMember?.name || "Member"} sx={{ width: 112, height: 112, bgcolor: "primary.main", fontSize: "2rem", fontWeight: 800 }}>{editMember?.name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</Avatar><Typography variant="caption" color="text.secondary">Member profile photo</Typography></Stack>
           {saveError && <Alert severity="error">{saveError}</Alert>}
-          <TextField label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
-          <TextField label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
-          <TextField label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
-          <TextField select label="Patrol" value={editMember?.patrol || ""} onChange={(event) => setEditMember((current) => ({ ...current, patrol: event.target.value, isPatrolLeader: members.some((member) => member._id !== current._id && member.patrol === event.target.value && member.isPatrolLeader) ? false : current.isPatrolLeader }))}>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</TextField>
-          <TextField required select label="Instrument" value={editMember?.instrument || ""} onChange={(event) => setEditMember((current) => ({ ...current, instrument: event.target.value }))} helperText={bandInspector ? `Band Inspector is assigned to ${bandInspector.name}.` : "Select the instrument played by this member."}>{INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && Boolean(bandInspector)}>{instrument}{instrument === "Band Inspector" && bandInspector ? " (already assigned)" : ""}</MenuItem>)}</TextField>
-          <TextField select label="Member status" value={editMember?.status || "active"} onChange={(event) => setEditMember((current) => ({ ...current, status: event.target.value }))} helperText={editMember?.status === "inactive" ? "Inactive members are sleeping and cannot sign in." : "Active members can access the member portal."}><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive (sleeping)</MenuItem></TextField>
-          <FormControlLabel control={<Checkbox checked={Boolean(editMember?.isPatrolLeader)} disabled={Boolean(patrolLeader)} onChange={(event) => setEditMember((current) => ({ ...current, isPatrolLeader: event.target.checked }))} />} label="Patrol leader" />
+          <TextField disabled={dialogMode === "view"} label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
+          <TextField disabled={dialogMode === "view"} label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
+          <TextField disabled={dialogMode === "view"} label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
+          <TextField disabled={dialogMode === "view"} select label="Patrol" value={editMember?.patrol || ""} onChange={(event) => setEditMember((current) => ({ ...current, patrol: event.target.value, isPatrolLeader: members.some((member) => member._id !== current._id && member.patrol === event.target.value && member.isPatrolLeader) ? false : current.isPatrolLeader }))}>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</TextField>
+          <TextField disabled={dialogMode === "view"} required select label="Instrument" value={editMember?.instrument || ""} onChange={(event) => setEditMember((current) => ({ ...current, instrument: event.target.value }))} helperText={dialogMode === "edit" ? (bandInspector ? `Band Inspector is assigned to ${bandInspector.name}.` : "Select the instrument played by this member.") : ""}>{INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && Boolean(bandInspector)}>{instrument}{instrument === "Band Inspector" && bandInspector ? " (already assigned)" : ""}</MenuItem>)}</TextField>
+          <TextField disabled={dialogMode === "view"} select label="Member status" value={editMember?.status || "active"} onChange={(event) => setEditMember((current) => ({ ...current, status: event.target.value }))} helperText={dialogMode === "edit" ? (editMember?.status === "inactive" ? "Inactive members are sleeping and cannot sign in." : "Active members can access the member portal.") : ""}><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive (sleeping)</MenuItem></TextField>
+          <FormControlLabel control={<Checkbox checked={Boolean(editMember?.isPatrolLeader)} disabled={dialogMode === "view" || Boolean(patrolLeader)} onChange={(event) => setEditMember((current) => ({ ...current, isPatrolLeader: event.target.checked }))} />} label="Patrol leader" />
           {patrolLeader && <Typography variant="caption" color="text.secondary">{editMember?.patrol} is already led by {patrolLeader.name}; this option is unavailable.</Typography>}
         </Stack></DialogContent>
-        <DialogActions><Button color="inherit" onClick={() => setEditMember(null)} disabled={saving}>Cancel</Button><Button variant="contained" onClick={handleSaveMember} disabled={saving || !editMember?.name?.trim() || !editMember?.instrument}>{saving ? "Saving..." : "Save changes"}</Button></DialogActions>
+        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !editMember?.name?.trim() || !editMember?.instrument}>Review changes</Button>}</DialogActions>
+      </Dialog>
+
+      <Dialog open={reviewOpen} onClose={() => !saving && setReviewOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Confirm member changes</DialogTitle>
+        <DialogContent><Typography color="text.secondary" sx={{ mb: 2 }}>Review the changes for {originalMember?.name} before confirming.</Typography><Stack spacing={1.25}>{memberChanges.map((change) => <Box key={change.key} sx={{ p: 1.5, borderRadius: 2, bgcolor: "action.hover" }}><Typography fontWeight={800}>{change.label}</Typography><Typography variant="body2" color="text.secondary" sx={{ overflowWrap: "anywhere" }}>{change.before} → {change.after}</Typography></Box>)}</Stack></DialogContent>
+        <DialogActions><Button color="inherit" onClick={() => setReviewOpen(false)} disabled={saving}>Go back</Button><Button variant="contained" onClick={handleSaveMember} disabled={saving}>{saving ? "Saving..." : "Confirm changes"}</Button></DialogActions>
       </Dialog>
 
       <ConfirmDialog

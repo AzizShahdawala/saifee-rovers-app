@@ -39,7 +39,6 @@ function App() {
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/profile" element={<UtilityPage />} />
-        <Route path="/settings" element={<UtilityPage />} />
         <Route path="/notifications" element={<UtilityPage />} />
       </Route>
 

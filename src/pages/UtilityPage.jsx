@@ -4,7 +4,6 @@ import { PageHeader } from "../components/common";
 
 const content = {
   "/profile": ["Profile", "Review the signed-in administrator account."],
-  "/settings": ["Settings", "Application preferences and account settings."],
   "/notifications": ["Notifications", "Recent application updates and attendance alerts."],
 };
 

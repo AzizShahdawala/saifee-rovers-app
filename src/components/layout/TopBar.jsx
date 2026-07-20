@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -14,16 +13,12 @@ import {
   Menu,
   MenuItem,
   Divider,
-  InputBase,
   ListItemIcon,
   ListItemText,
-  alpha,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import SettingsIcon from "@mui/icons-material/Settings";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -61,7 +56,7 @@ const notifications = [
   },
 ];
 
-export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
+export default function TopBar({ setMobileOpen, onMenuClick }) {
   const location = useLocation();
 
   const navigate = useNavigate();
@@ -164,11 +159,6 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
     navigate("/profile");
   };
 
-  const goToSettings = () => {
-    closeProfile();
-    navigate("/settings");
-  };
-
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(Boolean(document.fullscreenElement));
@@ -192,36 +182,6 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
       console.error("Fullscreen operation failed:", error);
     }
   };
-
-  const SearchBox = (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        px: 2,
-        py: 0.5,
-        borderRadius: 3,
-        background: (theme) => alpha(theme.palette.common.white, 0.15),
-
-        "&:hover": {
-          background: (theme) => alpha(theme.palette.common.white, 0.25),
-        },
-
-        width: 320,
-      }}
-    >
-      <SearchIcon />
-
-      <InputBase
-        placeholder="Search..."
-        sx={{
-          color: "inherit",
-          ml: 1,
-          flex: 1,
-        }}
-      />
-    </Box>
-  );
 
   return (
     <AppBar
@@ -261,20 +221,6 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
         </Box>
 
         <Box sx={{ flexGrow: 1 }} />
-
-        <Box
-          sx={{
-            display: {
-              xs: "none",
-
-              md: "block",
-            },
-
-            mr: 3,
-          }}
-        >
-          {SearchBox}
-        </Box>
 
         {/* Notifications */}
         <Tooltip title="Notifications">
@@ -427,23 +373,6 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
             }}
           >
             {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-          </IconButton>
-        </Tooltip>
-
-        {/* Settings */}
-        <Tooltip title="Settings">
-          <IconButton
-            onClick={() => navigate("/settings")}
-            aria-label="Open settings"
-            sx={{
-              display: {
-                xs: "none",
-                sm: "inline-flex",
-              },
-              mr: 1,
-            }}
-          >
-            <SettingsIcon />
           </IconButton>
         </Tooltip>
 
@@ -605,14 +534,6 @@ export default function TopBar({ mobileOpen, setMobileOpen, onMenuClick }) {
             </ListItemIcon>
 
             <ListItemText primary="My Profile" />
-          </MenuItem>
-
-          <MenuItem onClick={goToSettings}>
-            <ListItemIcon>
-              <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-
-            <ListItemText primary="Settings" />
           </MenuItem>
 
           <Divider />
