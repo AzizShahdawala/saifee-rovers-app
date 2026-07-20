@@ -1,4 +1,7 @@
-export const PATROLS = ["Fox", "Dove", "Bull", "Peacock", "Officers", "Mentor"];
+export const PATROLS = [
+  "Fox", "Dove", "Bull", "Peacock", "Officers", "Mentor",
+  "MPL", "Rhino", "Turtle", "Sleeping", "NRI",
+];
 
 export const INSTRUMENTS = [
   "Saxophone",
