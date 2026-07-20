@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Avatar, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Paper, Stack, TextField, Typography } from "@mui/material";
 import { CameraAltOutlined, LockResetOutlined, VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { changeMemberPassword, getMemberProfile, updateMemberProfilePhoto } from "../../services/memberPortalService";
+import { professionLabel } from "../../constants/memberOptions";
 import { getStoredUser } from "../../utils/auth";
 
 const errorMessage = (error, fallback) => error.response?.data?.message || error.message || fallback;
@@ -56,7 +57,7 @@ export default function MemberProfile() {
 
   if (!member && !error) return <Box sx={{ minHeight: 300, display: "grid", placeItems: "center" }}><CircularProgress /></Box>;
   if (!member) return <Alert severity="error">{error}</Alert>;
-  const fields = [["ITS ID", member.itsId], ["Full name", member.name], ["Email", member.email], ["Phone", member.phone], ["Patrol", member.patrol], ["Instrument", member.instrument || "Not assigned"], ["Member status", member.status], ["Joined", new Date(member.createdAt).toLocaleDateString("en-IN", { dateStyle: "long" })]];
+  const fields = [["ITS ID", member.itsId], ["Full name", member.name], ["Email", member.email], ["Phone", member.phone], ["Date of birth", new Date(member.dateOfBirth).toLocaleDateString("en-IN", { dateStyle: "long" })], ["Profession", professionLabel(member.profession)], ["Profession details", member.professionDetails || "Not applicable"], ["Patrol", member.patrol], ["Instrument", member.instrument || "Not assigned"], ["Member status", member.status], ["Joined", new Date(member.createdAt).toLocaleDateString("en-IN", { dateStyle: "long" })]];
 
   return <Stack spacing={3}>
     <Box><Typography variant="h4" fontWeight={900}>My profile</Typography><Typography color="text.secondary">Manage your profile picture, account security, and membership information.</Typography></Box>

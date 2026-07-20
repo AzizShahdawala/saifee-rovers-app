@@ -27,7 +27,7 @@ import CaptureProgress from "./CaptureProgress";
 import Loader from "../common/Loader";
 
 import useMemberForm from "../../hooks/useMemberForm";
-import { INSTRUMENTS, PATROLS } from "../../constants/memberOptions";
+import { INSTRUMENTS, PATROLS, PROFESSIONS, PROFESSION_DETAIL_LABELS, professionLabel } from "../../constants/memberOptions";
 
 import {
   validateName,
@@ -142,6 +142,20 @@ export default function MemberForm() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth type="date" label="Date of Birth" slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().slice(0, 10) } }} {...register("dateOfBirth", { required: "Date of birth is required" })} error={!!errors.dateOfBirth} helperText={errors.dateOfBirth?.message} />
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth select label="Profession" defaultValue="" {...register("profession", { required: "Profession is required" })} error={!!errors.profession} helperText={errors.profession?.message}>
+                  {PROFESSIONS.map((profession) => <MenuItem key={profession} value={profession}>{professionLabel(profession)}</MenuItem>)}
+                </TextField>
+              </Grid>
+
+              {formValues.profession && formValues.profession !== "RETIRED" && <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth label={PROFESSION_DETAIL_LABELS[formValues.profession] || "Profession details"} {...register("professionDetails", { validate: (value) => formValues.profession === "RETIRED" || Boolean(value?.trim()) || "Profession details are required" })} error={!!errors.professionDetails} helperText={errors.professionDetails?.message} />
+              </Grid>}
+
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField fullWidth select label={formValues.patrol === "OFFICERS" ? "Instrument (optional)" : "Instrument"} defaultValue="" {...register("instrument", { validate: (value) => formValues.patrol === "OFFICERS" || Boolean(value) || "Instrument is required" })} error={!!errors.instrument} helperText={errors.instrument?.message || (formValues.patrol === "OFFICERS" ? "OFFICERS can be registered without an instrument." : "Select the instrument played by this member.")}>
                   {INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && bandInspectorAssigned}>{instrument}{instrument === "Band Inspector" && bandInspectorAssigned ? " (already assigned)" : ""}</MenuItem>)}
                 </TextField>
@@ -181,6 +195,12 @@ export default function MemberForm() {
                     <Typography>
                       <strong>Phone:</strong> {formValues.phone || "-"}
                     </Typography>
+
+                    <Typography><strong>Date of Birth:</strong> {formValues.dateOfBirth || "-"}</Typography>
+
+                    <Typography><strong>Profession:</strong> {professionLabel(formValues.profession)}</Typography>
+
+                    {formValues.profession !== "RETIRED" && <Typography><strong>{PROFESSION_DETAIL_LABELS[formValues.profession] || "Profession details"}:</strong> {formValues.professionDetails || "-"}</Typography>}
 
                     <Typography>
                       <strong>Email:</strong> {formValues.email || "-"}

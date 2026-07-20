@@ -40,7 +40,7 @@ import {
   SearchBar,
   StatusChip,
 } from "../../components/common";
-import { INSTRUMENTS, PATROLS } from "../../constants/memberOptions";
+import { INSTRUMENTS, PATROLS, PROFESSIONS, PROFESSION_DETAIL_LABELS, professionLabel } from "../../constants/memberOptions";
 import FaceEnrollmentDialog from "../../components/member/FaceEnrollmentDialog";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -104,7 +104,7 @@ const Members = () => {
     const query = searchText.trim().toLowerCase();
 
     return members.filter((member) => {
-      const matchesQuery = !query || [member.itsId, member.name, member.email, member.phone, member.patrol, member.instrument].some(
+      const matchesQuery = !query || [member.itsId, member.name, member.email, member.phone, member.patrol, member.instrument, member.profession, member.professionDetails].some(
         (value) =>
           String(value || "")
             .toLowerCase()
@@ -123,10 +123,11 @@ const Members = () => {
   const memberChanges = useMemo(() => {
     if (!editMember || !originalMember) return [];
     const fields = [
-      ["itsId", "ITS ID"], ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["patrol", "Patrol"],
+      ["itsId", "ITS ID"], ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["dateOfBirth", "Date of birth"],
+      ["profession", "Profession"], ["professionDetails", "Profession details"], ["patrol", "Patrol"],
       ["instrument", "Instrument"], ["status", "Member status"], ["isPatrolLeader", "Patrol leader"],
     ];
-    const display = (key, value) => key === "isPatrolLeader" ? (value ? "Yes" : "No") : String(value || "Not set");
+    const display = (key, value) => key === "isPatrolLeader" ? (value ? "Yes" : "No") : key === "profession" ? professionLabel(value) : String(value || "Not set");
     return fields.filter(([key]) => (editMember[key] ?? "") !== (originalMember[key] ?? "")).map(([key, label]) => ({ key, label, before: display(key, originalMember[key]), after: display(key, editMember[key]) }));
   }, [editMember, originalMember]);
 
@@ -134,8 +135,8 @@ const Members = () => {
     setSaveError("");
     setSaveNotice("");
     setDialogMode(mode);
-    setOriginalMember({ ...member });
-    setEditMember({ ...member });
+    setEditMember({ ...member, dateOfBirth: member.dateOfBirth?.slice(0, 10) || "" });
+    setOriginalMember({ ...member, dateOfBirth: member.dateOfBirth?.slice(0, 10) || "" });
   };
 
   const closeMember = () => {
@@ -331,6 +332,7 @@ const Members = () => {
       minWidth: 150,
       render: (member) => member.instrument || "Not assigned",
     },
+    { id: "profession", label: "Profession", sortable: true, minWidth: 140, render: (member) => professionLabel(member.profession) },
     {
       id: "faceEnrolled",
       label: "Face Enrollment",
@@ -486,6 +488,9 @@ const Members = () => {
           <TextField disabled={dialogMode === "view"} label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
           <TextField disabled={dialogMode === "view"} label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
           <TextField disabled={dialogMode === "view"} label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
+          <TextField disabled={dialogMode === "view"} type="date" label="Date of Birth" value={editMember?.dateOfBirth || ""} slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().slice(0, 10) } }} onChange={(event) => setEditMember((current) => ({ ...current, dateOfBirth: event.target.value }))} required />
+          <TextField disabled={dialogMode === "view"} select label="Profession" value={editMember?.profession || ""} onChange={(event) => setEditMember((current) => ({ ...current, profession: event.target.value, professionDetails: event.target.value === "RETIRED" ? "" : current.professionDetails }))} required>{PROFESSIONS.map((profession) => <MenuItem key={profession} value={profession}>{professionLabel(profession)}</MenuItem>)}</TextField>
+          {editMember?.profession && editMember.profession !== "RETIRED" && <TextField disabled={dialogMode === "view"} label={PROFESSION_DETAIL_LABELS[editMember.profession] || "Profession details"} value={editMember?.professionDetails || ""} onChange={(event) => setEditMember((current) => ({ ...current, professionDetails: event.target.value }))} required />}
           <TextField disabled={dialogMode === "view"} select label="Patrol" value={editMember?.patrol || ""} onChange={(event) => setEditMember((current) => ({ ...current, patrol: event.target.value, isPatrolLeader: members.some((member) => member._id !== current._id && member.patrol === event.target.value && member.isPatrolLeader) ? false : current.isPatrolLeader }))}>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</TextField>
           <TextField disabled={dialogMode === "view"} required={editMember?.patrol !== "OFFICERS"} select label={editMember?.patrol === "OFFICERS" ? "Instrument (optional)" : "Instrument"} value={editMember?.instrument || ""} onChange={(event) => setEditMember((current) => ({ ...current, instrument: event.target.value }))} helperText={dialogMode === "edit" ? (bandInspector ? `Band Inspector is assigned to ${bandInspector.name}.` : editMember?.patrol === "OFFICERS" ? "OFFICERS can be saved without an instrument." : "Select the instrument played by this member.") : ""}>{editMember?.patrol === "OFFICERS" && <MenuItem value=""><em>No instrument</em></MenuItem>}{INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && Boolean(bandInspector)}>{instrument}{instrument === "Band Inspector" && bandInspector ? " (already assigned)" : ""}</MenuItem>)}</TextField>
           <TextField disabled={dialogMode === "view"} select label="Member status" value={editMember?.status || "active"} onChange={(event) => setEditMember((current) => ({ ...current, status: event.target.value }))} helperText={dialogMode === "edit" ? (editMember?.status === "inactive" ? "Inactive members are sleeping and cannot sign in." : "Active members can access the member portal.") : ""}><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive (sleeping)</MenuItem></TextField>
@@ -493,7 +498,7 @@ const Members = () => {
           {patrolLeader && <Typography variant="caption" color="text.secondary">{editMember?.patrol} is already led by {patrolLeader.name}; this option is unavailable.</Typography>}
           {dialogMode === "edit" && <Button variant="outlined" startIcon={<FaceRetouchingNaturalOutlined />} onClick={() => setEnrollmentMember(editMember)}>{editMember?.faceEnrolled ? "Update face enrollment" : "Enroll face"}</Button>}
         </Stack></DialogContent>
-        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !/^\d{8}$/.test(editMember?.itsId || "") || !editMember?.name?.trim() || (editMember?.patrol !== "OFFICERS" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
+        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !/^\d{8}$/.test(editMember?.itsId || "") || !editMember?.name?.trim() || !editMember?.dateOfBirth || !editMember?.profession || (editMember.profession !== "RETIRED" && !editMember?.professionDetails?.trim()) || (editMember?.patrol !== "OFFICERS" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
       </Dialog>
 
       <Dialog open={reviewOpen} onClose={() => !saving && setReviewOpen(false)} fullWidth maxWidth="sm">

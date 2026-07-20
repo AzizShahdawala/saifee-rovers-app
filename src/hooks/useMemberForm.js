@@ -26,6 +26,12 @@ export default function useMemberForm() {
 
       formData.append("phone", data.phone);
 
+      formData.append("dateOfBirth", data.dateOfBirth);
+
+      formData.append("profession", data.profession);
+
+      if (data.professionDetails) formData.append("professionDetails", data.professionDetails);
+
       formData.append("email", data.email);
 
       formData.append("patrol", data.patrol);
