@@ -4,6 +4,7 @@ import EventIcon from "@mui/icons-material/Event";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
+import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
 
 const navigation = [
   {
@@ -35,6 +36,11 @@ const navigation = [
     title: "Patrol Scoreboard",
     icon: LeaderboardOutlinedIcon,
     path: "/patrol-scoreboard",
+  },
+  {
+    title: "Birthdays",
+    icon: CakeOutlinedIcon,
+    path: "/birthdays",
   },
 ];
 
