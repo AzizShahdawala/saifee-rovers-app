@@ -17,6 +17,7 @@ import MemberDashboard from "./pages/member/MemberDashboard";
 import MemberAttendance from "./pages/member/MemberAttendance";
 import MemberEvents from "./pages/member/MemberEvents";
 import MemberProfile from "./pages/member/MemberProfile";
+import AdminProfile from "./pages/AdminProfile";
 
 function App() {
   return (
@@ -38,7 +39,7 @@ function App() {
         <Route path="/events/:id/edit" element={<CreateEvent />} />
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/reports" element={<Reports />} />
-        <Route path="/profile" element={<UtilityPage />} />
+        <Route path="/profile" element={<AdminProfile />} />
         <Route path="/notifications" element={<UtilityPage />} />
       </Route>
 

@@ -70,6 +70,7 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
   const [notificationAnchor, setNotificationAnchor] = useState(null);
 
   const [dateTime, setDateTime] = useState(new Date());
+  const [, setSessionVersion] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -77,6 +78,12 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const refreshSession = () => setSessionVersion((version) => version + 1);
+    window.addEventListener("session-updated", refreshSession);
+    return () => window.removeEventListener("session-updated", refreshSession);
   }, []);
 
   const title = getNavigationTitle(location.pathname);
@@ -99,6 +106,7 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
         name: parsedUser.name || "Admin User",
         role: parsedUser.role || "Scout Leader",
         email: parsedUser.email || "admin@scouts.local",
+        profileImage: parsedUser.profileImage,
       };
     } catch {
       return {
@@ -416,6 +424,7 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
           }}
         >
           <Avatar
+            src={user.profileImage}
             sx={{
               width: 38,
               height: 38,
@@ -498,6 +507,7 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
             }}
           >
             <Avatar
+              src={user.profileImage}
               sx={{
                 width: 46,
                 height: 46,
