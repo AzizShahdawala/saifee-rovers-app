@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Alert, Box, Button, CircularProgress, Divider, Grid, MenuItem, Paper, Stack, TextField, Typography } from "@mui/material";
-import { CalendarMonthOutlined, GroupsOutlined, LocationOnOutlined, SaveOutlined, ScheduleOutlined, SubjectOutlined } from "@mui/icons-material";
+import { CalendarMonthOutlined, LocationOnOutlined, SaveOutlined, ScheduleOutlined, SubjectOutlined } from "@mui/icons-material";
 import { PageHeader, StatusChip } from "../components/common";
 import EventMediaGallery from "../components/events/EventMediaGallery";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-const initialForm = { title: "", date: "", startTime: "", endTime: "", venue: "", agenda: "", capacity: "", status: "upcoming" };
+const initialForm = { title: "", date: "", startTime: "", endTime: "", venue: "", agenda: "", status: "upcoming" };
 
 export default function CreateEvent() {
   const { id } = useParams();
@@ -51,7 +51,7 @@ export default function CreateEvent() {
       <Paper sx={{ p: { xs: 2.5, md: 4 }, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
         <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ sm: "flex-start" }} spacing={2}><Box sx={{ minWidth: 0 }}><Typography variant="overline" color="primary.main" fontWeight={900}>Event details</Typography><Typography variant="h4" fontWeight={900} sx={{ overflowWrap: "anywhere" }}>{form.title}</Typography></Box><StatusChip status={form.status} /></Stack>
         <Divider sx={{ my: 3 }} />
-        <Grid container spacing={2}><Detail icon={<CalendarMonthOutlined />} label="Date" value={form.date ? new Date(`${form.date}T00:00:00`).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : "Not set"} /><Detail icon={<ScheduleOutlined />} label="Time" value={`${form.startTime || "Not set"}${form.endTime ? ` – ${form.endTime}` : ""}`} /><Detail icon={<LocationOnOutlined />} label="Venue" value={form.venue || "Not set"} /><Detail icon={<GroupsOutlined />} label="Capacity" value={form.capacity || "Not set"} /></Grid>
+        <Grid container spacing={2}><Detail icon={<CalendarMonthOutlined />} label="Date" value={form.date ? new Date(`${form.date}T00:00:00`).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : "Not set"} /><Detail icon={<ScheduleOutlined />} label="Time" value={`${form.startTime || "Not set"}${form.endTime ? ` – ${form.endTime}` : ""}`} /><Detail icon={<LocationOnOutlined />} label="Venue" value={form.venue || "Not set"} /></Grid>
         <Divider sx={{ my: 3 }} /><Stack direction="row" spacing={1.5} alignItems="flex-start"><SubjectOutlined color="primary" /><Box><Typography variant="caption" color="text.secondary" textTransform="uppercase" fontWeight={800}>Agenda</Typography><Typography sx={{ mt: .5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{form.agenda || "No agenda was added."}</Typography></Box></Stack>
       </Paper>
       {form.status === "completed" && <Paper sx={{ p: { xs: 2.5, md: 4 }, border: "1px solid", borderColor: "divider" }}><EventMediaGallery eventId={id} canUpload /></Paper>}
@@ -61,7 +61,7 @@ export default function CreateEvent() {
 
   return (
     <Box>
-      <PageHeader title={readOnly ? "View Event" : id ? "Edit Event" : "Create Event"} subtitle={readOnly ? "Completed and cancelled events are retained as read-only records." : "Schedule the agenda, venue, capacity, and attendance window."} backPath="/events" />
+      <PageHeader title={readOnly ? "View Event" : id ? "Edit Event" : "Create Event"} subtitle={readOnly ? "Completed and cancelled events are retained as read-only records." : "Schedule the agenda, venue, and attendance window."} backPath="/events" />
       <Paper component="form" onSubmit={submit} sx={{ p: { xs: 2.5, md: 4 }, border: "1px solid", borderColor: "divider", ...(readOnly && { bgcolor: "grey.50", "& .MuiInputBase-root.Mui-disabled": { bgcolor: "grey.200" }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "rgba(0, 0, 0, 0.62)" }, "& .MuiInputLabel-root.Mui-disabled": { color: "text.secondary" } }) }}>
         {readOnly && <Alert severity="info" sx={{ mb: 3 }}>This event is {form.status} and can no longer be changed.</Alert>}
         <fieldset disabled={fieldsDisabled} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
@@ -71,8 +71,7 @@ export default function CreateEvent() {
           <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={fieldsDisabled} label="Date" type="date" value={form.date} onChange={change("date")} required InputLabelProps={{ shrink: true }} /></Grid>
           <Grid size={{ xs: 6, sm: 4 }}><TextField disabled={fieldsDisabled} label="Start time" type="time" value={form.startTime} onChange={change("startTime")} InputLabelProps={{ shrink: true }} /></Grid>
           <Grid size={{ xs: 6, sm: 4 }}><TextField disabled={fieldsDisabled} label="End time" type="time" value={form.endTime} onChange={change("endTime")} InputLabelProps={{ shrink: true }} /></Grid>
-          <Grid size={{ xs: 12, md: 8 }}><TextField disabled={fieldsDisabled} label="Venue" value={form.venue} onChange={change("venue")} required /></Grid>
-          <Grid size={{ xs: 12, md: 4 }}><TextField disabled={fieldsDisabled} label="Capacity" type="number" value={form.capacity} onChange={change("capacity")} inputProps={{ min: 1 }} /></Grid>
+          <Grid size={12}><TextField disabled={fieldsDisabled} label="Venue" value={form.venue} onChange={change("venue")} required /></Grid>
           <Grid size={12}><TextField disabled={fieldsDisabled} label="Agenda" value={form.agenda} onChange={change("agenda")} multiline minRows={5} placeholder="Add activities, timings, responsibilities, and notes..." /></Grid>
         </Grid>
         </fieldset>
