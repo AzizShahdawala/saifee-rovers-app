@@ -167,7 +167,7 @@ export default function MemberForm() {
                       color="text.secondary"
                       sx={{ mb: 2 }}
                     >
-                      Verify the entered details before registering.
+                      Verify the details before registering. Face enrollment can be completed now or later from Edit Member.
                     </Typography>
 
                     <Typography>
@@ -202,7 +202,7 @@ export default function MemberForm() {
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
-                      Face Enrollment
+                      Face Enrollment (optional)
                     </Typography>
 
                     <Box sx={{ mb: 2 }}>
@@ -294,13 +294,13 @@ export default function MemberForm() {
                 type="submit"
                 variant="contained"
                 size="large"
-                disabled={loading || Object.keys(capturedImages).length !== 5}
+                disabled={loading || (Object.keys(capturedImages).length > 0 && Object.keys(capturedImages).length !== 5)}
                 sx={{
                   width: { xs: "100%", sm: 300 },
                   height: 50,
                 }}
               >
-                {loading ? "Registering..." : "Register Member"}
+                {loading ? "Registering..." : Object.keys(capturedImages).length === 5 ? "Register with Face Enrollment" : "Register without Face Enrollment"}
               </Button>
             </Box>
           </Box>

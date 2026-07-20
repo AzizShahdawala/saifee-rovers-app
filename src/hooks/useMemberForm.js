@@ -15,7 +15,9 @@ export default function useMemberForm() {
     setLoading(true);
 
     try {
-      await checkEnrollmentService();
+      const imageCount = Object.keys(capturedImages).length;
+      if (imageCount > 0 && imageCount !== 5) throw new Error("Complete all 5 face poses or remove them to register without enrollment");
+      if (imageCount === 5) await checkEnrollmentService();
       const formData = new FormData();
 
       formData.append("name", data.name);
@@ -52,7 +54,7 @@ export default function useMemberForm() {
 
       return true;
     } catch (err) {
-      toast.error(err.response?.data?.message || (err.code === "ECONNABORTED" ? "Face recognition service did not respond. Restart the backend with npm run dev." : "Registration Failed"));
+      toast.error(err.response?.data?.message || err.message || (err.code === "ECONNABORTED" ? "Face recognition service did not respond. Restart the backend with npm run dev." : "Registration Failed"));
 
       return false;
     } finally {

@@ -36,6 +36,8 @@ export const updateMember = (
   );
 };
 
+export const enrollMemberFace = (id, data) => API.put(`/members/${id}/face-enrollment`, data, { headers: { "Content-Type": "multipart/form-data" }, timeout: 0 });
+
 export const deleteMember = (id) => {
   return API.delete(`/members/${id}`);
 };

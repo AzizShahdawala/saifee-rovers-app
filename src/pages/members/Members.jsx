@@ -29,6 +29,7 @@ import {
   PersonAddAlt1,
   PeopleOutlined,
   VisibilityOutlined,
+  FaceRetouchingNaturalOutlined,
 } from "@mui/icons-material";
 
 import {
@@ -39,6 +40,7 @@ import {
   StatusChip,
 } from "../../components/common";
 import { INSTRUMENTS, PATROLS } from "../../constants/memberOptions";
+import FaceEnrollmentDialog from "../../components/member/FaceEnrollmentDialog";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -57,8 +59,10 @@ const Members = () => {
   const [originalMember, setOriginalMember] = useState(null);
   const [dialogMode, setDialogMode] = useState("edit");
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [enrollmentMember, setEnrollmentMember] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [saveNotice, setSaveNotice] = useState("");
 
   const fetchMembers = async () => {
     try {
@@ -118,6 +122,7 @@ const Members = () => {
 
   const openMember = (member, mode) => {
     setSaveError("");
+    setSaveNotice("");
     setDialogMode(mode);
     setOriginalMember({ ...member });
     setEditMember({ ...member });
@@ -136,7 +141,17 @@ const Members = () => {
       return;
     }
     setSaveError("");
+    setSaveNotice("");
     setReviewOpen(true);
+  };
+
+  const enrollmentSaved = (updated, message) => {
+    setMembers((current) => current.map((member) => member._id === updated._id ? { ...member, ...updated } : member));
+    setEditMember((current) => current?._id === updated._id ? { ...current, faceEnrolled: updated.faceEnrolled, images: updated.images, updatedAt: updated.updatedAt } : current);
+    setOriginalMember((current) => current?._id === updated._id ? { ...current, faceEnrolled: updated.faceEnrolled, images: updated.images, updatedAt: updated.updatedAt } : current);
+    setEnrollmentMember(null);
+    setSaveError("");
+    setSaveNotice(message || "Face enrollment saved successfully");
   };
 
   const handleSaveMember = async () => {
@@ -421,6 +436,7 @@ const Members = () => {
         <DialogContent><Stack spacing={2} sx={{ pt: 1 }}>
           <Stack alignItems="center" spacing={1} sx={{ pb: 1 }}><Avatar src={editMember?.profileImage || editMember?.imageUrl || undefined} alt={editMember?.name || "Member"} sx={{ width: 112, height: 112, bgcolor: "primary.main", fontSize: "2rem", fontWeight: 800 }}>{editMember?.name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</Avatar><Typography variant="caption" color="text.secondary">Member profile photo</Typography></Stack>
           {saveError && <Alert severity="error">{saveError}</Alert>}
+          {saveNotice && <Alert severity="success">{saveNotice}</Alert>}
           <TextField disabled={dialogMode === "view"} label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
           <TextField disabled={dialogMode === "view"} label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
           <TextField disabled={dialogMode === "view"} label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
@@ -429,6 +445,7 @@ const Members = () => {
           <TextField disabled={dialogMode === "view"} select label="Member status" value={editMember?.status || "active"} onChange={(event) => setEditMember((current) => ({ ...current, status: event.target.value }))} helperText={dialogMode === "edit" ? (editMember?.status === "inactive" ? "Inactive members are sleeping and cannot sign in." : "Active members can access the member portal.") : ""}><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive (sleeping)</MenuItem></TextField>
           <FormControlLabel control={<Checkbox checked={Boolean(editMember?.isPatrolLeader)} disabled={dialogMode === "view" || Boolean(patrolLeader)} onChange={(event) => setEditMember((current) => ({ ...current, isPatrolLeader: event.target.checked }))} />} label="Patrol leader" />
           {patrolLeader && <Typography variant="caption" color="text.secondary">{editMember?.patrol} is already led by {patrolLeader.name}; this option is unavailable.</Typography>}
+          {dialogMode === "edit" && <Button variant="outlined" startIcon={<FaceRetouchingNaturalOutlined />} onClick={() => setEnrollmentMember(editMember)}>{editMember?.faceEnrolled ? "Update face enrollment" : "Enroll face"}</Button>}
         </Stack></DialogContent>
         <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !editMember?.name?.trim() || !editMember?.instrument}>Review changes</Button>}</DialogActions>
       </Dialog>
@@ -451,6 +468,7 @@ const Members = () => {
         onClose={handleDeleteClose}
         onConfirm={handleDeleteConfirm}
       />
+      {enrollmentMember && <FaceEnrollmentDialog member={enrollmentMember} onClose={() => setEnrollmentMember(null)} onEnrolled={enrollmentSaved} />}
     </Box>
   );
 };
