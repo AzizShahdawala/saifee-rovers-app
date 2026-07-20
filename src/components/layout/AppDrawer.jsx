@@ -104,10 +104,10 @@ export default function AppDrawer({
 
           {!collapsed && (
             <Box>
-              <Typography fontWeight={700}>Scout Attendance</Typography>
+              <Typography fontWeight={700}>Saifee Rovers</Typography>
 
               <Typography variant="caption" color="text.secondary">
-                Face Recognition
+                Attendance Management
               </Typography>
             </Box>
           )}

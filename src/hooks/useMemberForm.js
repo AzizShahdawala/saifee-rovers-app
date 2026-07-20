@@ -70,7 +70,7 @@ export default function useMemberForm() {
 
       return true;
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message || (err.code === "ECONNABORTED" ? "Face recognition service did not respond. Restart the backend with npm run dev." : "Registration Failed"));
+      toast.error(err.response?.data?.message || err.message || (err.code === "ECONNABORTED" ? "Face enrollment service did not respond. Restart the backend with npm run dev." : "Registration Failed"));
 
       return false;
     } finally {

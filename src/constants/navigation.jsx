@@ -60,7 +60,7 @@ export const getNavigationTitle = (pathname) => {
       pathname.startsWith(`${item.path}/`)
     );
 
-  return nestedMatch?.title || "Scout Attendance";
+  return nestedMatch?.title || "Saifee Rovers";
 };
 
 export default navigation;

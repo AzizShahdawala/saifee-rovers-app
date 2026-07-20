@@ -110,7 +110,7 @@ export default function Attendance() {
 
   return (
     <Box>
-      <PageHeader title="Attendance Scanner" subtitle="Live face recognition with instant attendance and manual override." actions={<Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" }, "& .MuiButton-root": { width: { xs: "100%", sm: "auto" } } }}><Button variant="outlined" startIcon={<FullscreenOutlined />} disabled={!hasActiveEvent} onClick={() => scannerSectionRef.current?.requestFullscreen?.()}>Full screen</Button><Button variant="contained" startIcon={<PersonAddOutlined />} disabled={!hasActiveEvent} onClick={() => setManualOpen(true)}>Manual Attendance</Button></Stack>} />
+      <PageHeader title="Attendance Scanner" subtitle="Live face scanning with instant attendance and manual override." actions={<Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" }, "& .MuiButton-root": { width: { xs: "100%", sm: "auto" } } }}><Button variant="outlined" startIcon={<FullscreenOutlined />} disabled={!hasActiveEvent} onClick={() => scannerSectionRef.current?.requestFullscreen?.()}>Full screen</Button><Button variant="contained" startIcon={<PersonAddOutlined />} disabled={!hasActiveEvent} onClick={() => setManualOpen(true)}>Manual Attendance</Button></Stack>} />
       {eventsLoaded && !hasActiveEvent && <Alert severity="info" sx={{ mb: 2.5 }}>No event is currently active. The scanner and manual attendance will become available during an event's scheduled time.</Alert>}
       <Grid ref={scannerSectionRef} container spacing={2.5} sx={{ bgcolor: "background.default" }}>
         <Grid size={{ xs: 12, lg: 8 }}>
