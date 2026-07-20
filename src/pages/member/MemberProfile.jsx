@@ -34,6 +34,7 @@ export default function MemberProfile() {
       setMember(data.member);
       const storedUser = getStoredUser();
       if (storedUser) localStorage.setItem("user", JSON.stringify({ ...storedUser, profileImage: data.member.profileImage }));
+      window.dispatchEvent(new Event("session-updated"));
       setNotice(data.message);
     } catch (requestError) {
       setError(errorMessage(requestError, "Could not update your profile picture"));

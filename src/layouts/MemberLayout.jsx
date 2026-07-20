@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { AppBar, Avatar, Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material";
+import { AppBar, Avatar, Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material";
 import { DashboardOutlined, EventOutlined, FactCheckOutlined, LogoutOutlined, MenuOutlined, PersonOutlined } from "@mui/icons-material";
 import logo from "../assets/logo.png";
 import { clearSession, getStoredUser } from "../utils/auth";
@@ -10,15 +10,19 @@ const links = [
   { label: "Overview", path: "/member", icon: DashboardOutlined },
   { label: "My attendance", path: "/member/attendance", icon: FactCheckOutlined },
   { label: "Events", path: "/member/events", icon: EventOutlined },
-  { label: "My profile", path: "/member/profile", icon: PersonOutlined },
 ];
 
 export default function MemberLayout() {
   const [open, setOpen] = useState(false);
+  const [profileAnchor, setProfileAnchor] = useState(null);
+  const [, setSessionVersion] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const user = getStoredUser() || {};
-  const logout = () => { clearSession(); navigate("/", { replace: true }); };
+  useEffect(() => { const refresh = () => setSessionVersion((version) => version + 1); window.addEventListener("session-updated", refresh); return () => window.removeEventListener("session-updated", refresh); }, []);
+  const closeProfile = () => setProfileAnchor(null);
+  const logout = () => { closeProfile(); clearSession(); navigate("/", { replace: true }); };
+  const showProfile = () => { closeProfile(); navigate("/member/profile"); };
   const content = <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
     <Toolbar sx={{ gap: 1.5 }}><Avatar src={logo} /><Box><Typography fontWeight={800}>Saifee Rovers</Typography><Typography variant="caption" color="text.secondary">Member portal</Typography></Box></Toolbar>
     <Divider />
@@ -28,6 +32,6 @@ export default function MemberLayout() {
   return <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
     <Drawer variant="temporary" open={open} onClose={() => setOpen(false)} sx={{ display: { xs: "block", md: "none" }, "& .MuiDrawer-paper": { width } }}>{content}</Drawer>
     <Drawer variant="permanent" sx={{ display: { xs: "none", md: "block" }, width, flexShrink: 0, "& .MuiDrawer-paper": { width } }}>{content}</Drawer>
-    <Box sx={{ minWidth: 0, flex: 1 }}><AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}><Toolbar><IconButton onClick={() => setOpen(true)} sx={{ display: { md: "none" }, mr: 1 }} aria-label="Open menu"><MenuOutlined /></IconButton><Box sx={{ flex: 1 }}><Typography fontWeight={800}>Member Portal</Typography><Typography variant="caption" color="text.secondary">Welcome, {user.name || "member"}</Typography></Box><Avatar src={user.profileImage}>{user.name?.[0]}</Avatar></Toolbar></AppBar><Box component="main" sx={{ p: { xs: 2, sm: 3, lg: 4 }, maxWidth: 1400, mx: "auto" }}><Outlet /></Box></Box>
+    <Box sx={{ minWidth: 0, flex: 1 }}><AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}><Toolbar><IconButton onClick={() => setOpen(true)} sx={{ display: { md: "none" }, mr: 1 }} aria-label="Open menu"><MenuOutlined /></IconButton><Box sx={{ flex: 1 }}><Typography fontWeight={800}>Member Portal</Typography><Typography variant="caption" color="text.secondary">Welcome, {user.name || "member"}</Typography></Box><Tooltip title="Account menu"><IconButton onClick={(event) => setProfileAnchor(event.currentTarget)} aria-label="Open member account menu" aria-controls={profileAnchor ? "member-profile-menu" : undefined} aria-haspopup="true" aria-expanded={profileAnchor ? "true" : undefined} sx={{ p: .5 }}><Avatar src={user.profileImage}>{user.name?.[0]}</Avatar></IconButton></Tooltip><Menu id="member-profile-menu" anchorEl={profileAnchor} open={Boolean(profileAnchor)} onClose={closeProfile} anchorOrigin={{ vertical: "bottom", horizontal: "right" }} transformOrigin={{ vertical: "top", horizontal: "right" }} slotProps={{ paper: { sx: { width: 260, mt: 1, borderRadius: 3 } } }}><Box sx={{ px: 2.25, py: 2, display: "flex", alignItems: "center", gap: 1.5 }}><Avatar src={user.profileImage} sx={{ width: 46, height: 46 }}>{user.name?.[0]}</Avatar><Box sx={{ minWidth: 0 }}><Typography fontWeight={800} noWrap>{user.name || "Member"}</Typography><Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block" }}>{user.email || user.patrol || "Rover member"}</Typography></Box></Box><Divider /><MenuItem onClick={showProfile}><ListItemIcon><PersonOutlined fontSize="small" /></ListItemIcon><ListItemText primary="My Profile" /></MenuItem><Divider /><MenuItem onClick={logout} sx={{ color: "error.main" }}><ListItemIcon sx={{ color: "error.main" }}><LogoutOutlined fontSize="small" /></ListItemIcon><ListItemText primary="Sign out" /></MenuItem></Menu></Toolbar></AppBar><Box component="main" sx={{ p: { xs: 2, sm: 3, lg: 4 }, maxWidth: 1400, mx: "auto" }}><Outlet /></Box></Box>
   </Box>;
 }
