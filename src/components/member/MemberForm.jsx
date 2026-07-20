@@ -138,14 +138,14 @@ export default function MemberForm() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth select label="Instrument" defaultValue="" {...register("instrument", { required: "Instrument is required" })} error={!!errors.instrument} helperText={errors.instrument?.message}>
+                <TextField fullWidth select label={formValues.patrol === "Officers" ? "Instrument (optional)" : "Instrument"} defaultValue="" {...register("instrument", { validate: (value) => formValues.patrol === "Officers" || Boolean(value) || "Instrument is required" })} error={!!errors.instrument} helperText={errors.instrument?.message || (formValues.patrol === "Officers" ? "Officers can be registered without an instrument." : "Select the instrument played by this member.")}>
                   {INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && bandInspectorAssigned}>{instrument}{instrument === "Band Inspector" && bandInspectorAssigned ? " (already assigned)" : ""}</MenuItem>)}
                 </TextField>
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
                 <FormControlLabel control={<Checkbox {...register("isPatrolLeader")} disabled={!formValues.patrol || patrolHasLeader} />} label="Patrol leader" />
-                <Typography variant="caption" color="text.secondary" display="block">{patrolHasLeader ? `${formValues.patrol} already has a patrol leader.` : "Only one member can lead each patrol."}</Typography>
+                <Typography variant="caption" color="text.secondary" display="block">{patrolHasLeader ? `${formValues.patrol} already has a patrol leader.` : formValues.patrol === "Officers" ? "Patrol leader is optional for Officers." : "Patrol leader is optional; only one member can lead each patrol."}</Typography>
               </Grid>
             </Grid>
 
