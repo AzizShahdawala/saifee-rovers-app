@@ -33,7 +33,6 @@ import {
   StatCard,
   StatusChip,
 } from "../../components/common";
-import AttendanceChart from "../../components/charts/AttendanceChart";
 import PatrolChart from "../../components/charts/PatrolChart";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -73,9 +72,7 @@ const Dashboard = () => {
     recentAttendance: [],
     recentMembers: [],
     upcomingEvents: [],
-    attendanceTrend: [],
     patrolDistribution: [],
-    recognitionAccuracy: 0,
   });
 
   useEffect(() => {
@@ -104,12 +101,8 @@ const Dashboard = () => {
             result.recentMembers ?? result.data?.recentMembers ?? [],
           upcomingEvents:
             result.upcomingEvents ?? result.data?.upcomingEvents ?? [],
-          attendanceTrend:
-            result.attendanceTrend ?? result.data?.attendanceTrend ?? [],
           patrolDistribution:
             result.patrolDistribution ?? result.data?.patrolDistribution ?? [],
-          recognitionAccuracy:
-            result.recognitionAccuracy ?? result.data?.recognitionAccuracy ?? 0,
         });
       } catch (error) {
         console.error("Fetch dashboard error:", error);
@@ -133,7 +126,7 @@ const Dashboard = () => {
       />
 
       <Grid container spacing={2.5}>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
           <StatCard
             title="Total Members"
             value={dashboardData.totalMembers}
@@ -145,24 +138,8 @@ const Dashboard = () => {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 8 }}>
-          <DashboardCard title="Attendance Analytics" subtitle="Seven-day check-in trend" icon={<TrendingUp />}>
-            <AttendanceChart data={dashboardData.attendanceTrend} />
-          </DashboardCard>
-        </Grid>
-
-        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardCard title="Patrol Distribution" subtitle="Members by patrol" icon={<GroupsOutlined />}>
-            <PatrolChart data={dashboardData.patrolDistribution} />
-          </DashboardCard>
-        </Grid>
-
-        <Grid size={12}>
-          <DashboardCard title="Recognition Health" subtitle="Live face-recognition readiness" icon={<CheckCircleOutlined />}>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={3} divider={<Divider orientation="vertical" flexItem sx={{ display: { xs: "none", sm: "block" } }} />}>
-              <Box><Typography variant="h4" fontWeight={800} color="success.main">{dashboardData.recognitionAccuracy}%</Typography><Typography color="text.secondary">Recognition accuracy</Typography></Box>
-              <Box><Typography variant="h4" fontWeight={800}>{dashboardData.totalMembers}</Typography><Typography color="text.secondary">Enrolled identities</Typography></Box>
-              <Box><StatusChip status={dashboardData.recognitionAccuracy >= 80 ? "active" : "pending"} /><Typography color="text.secondary" sx={{ mt: 1 }}>Recognition status</Typography></Box>
-            </Stack>
+            <PatrolChart data={dashboardData.patrolDistribution} onPatrolClick={(patrol) => navigate(`/members?patrol=${encodeURIComponent(patrol)}`)} />
           </DashboardCard>
         </Grid>
 
@@ -233,7 +210,7 @@ const Dashboard = () => {
               <List disablePadding>
                 {dashboardData.recentAttendance.map((attendance, index) => (
                   <Box
-                    key={attendance._id || `${attendance.memberId}-${index}`}
+                    key={attendance._id || `${attendance.member?._id}-${index}`}
                   >
                     <ListItem
                       disableGutters
@@ -261,9 +238,7 @@ const Dashboard = () => {
                               "Unknown member"}
                           </Typography>
                         }
-                        secondary={`${formatDate(
-                          attendance.timestamp,
-                        )} at ${formatTime(attendance.timestamp)}`}
+                        secondary={`${attendance.event?.title || attendance.eventTitle || "Event unavailable"} • ${formatDate(attendance.timestamp)} at ${formatTime(attendance.timestamp)}`}
                       />
                     </ListItem>
 

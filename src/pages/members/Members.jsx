@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   Alert,
@@ -47,6 +47,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const Members = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [members, setMembers] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -54,7 +55,10 @@ const Members = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [patrolFilter, setPatrolFilter] = useState("all");
+  const [patrolFilter, setPatrolFilter] = useState(() => {
+    const requestedPatrol = searchParams.get("patrol")?.toUpperCase();
+    return PATROLS.includes(requestedPatrol) ? requestedPatrol : "all";
+  });
   const [statusFilter, setStatusFilter] = useState("all");
   const [enrollmentFilter, setEnrollmentFilter] = useState("all");
   const [exporting, setExporting] = useState(false);
@@ -100,7 +104,7 @@ const Members = () => {
     const query = searchText.trim().toLowerCase();
 
     return members.filter((member) => {
-      const matchesQuery = !query || [member.memberId, member.name, member.email, member.phone, member.patrol, member.instrument].some(
+      const matchesQuery = !query || [member.itsId, member.name, member.email, member.phone, member.patrol, member.instrument].some(
         (value) =>
           String(value || "")
             .toLowerCase()
@@ -119,7 +123,7 @@ const Members = () => {
   const memberChanges = useMemo(() => {
     if (!editMember || !originalMember) return [];
     const fields = [
-      ["memberId", "Member ID"], ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["patrol", "Patrol"],
+      ["itsId", "ITS ID"], ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["patrol", "Patrol"],
       ["instrument", "Instrument"], ["status", "Member status"], ["isPatrolLeader", "Patrol leader"],
     ];
     const display = (key, value) => key === "isPatrolLeader" ? (value ? "Yes" : "No") : String(value || "Not set");
@@ -254,7 +258,7 @@ const Members = () => {
   };
 
   const columns = [
-    { id: "memberId", label: "Member ID", sortable: true, minWidth: 115, nowrap: true, render: (member) => member.memberId || "Not assigned" },
+    { id: "itsId", label: "ITS ID", sortable: true, minWidth: 115, nowrap: true, render: (member) => member.itsId || "Not assigned" },
     {
       id: "name",
       label: "Member",
@@ -472,18 +476,18 @@ const Members = () => {
           <Stack alignItems="center" spacing={1} sx={{ pb: 1 }}><Avatar src={editMember?.profileImage || editMember?.imageUrl || undefined} alt={editMember?.name || "Member"} sx={{ width: 112, height: 112, bgcolor: "primary.main", fontSize: "2rem", fontWeight: 800 }}>{editMember?.name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</Avatar><Typography variant="caption" color="text.secondary">Member profile photo</Typography></Stack>
           {saveError && <Alert severity="error">{saveError}</Alert>}
           {saveNotice && <Alert severity="success">{saveNotice}</Alert>}
-          <TextField disabled={dialogMode === "view"} label="Member ID" value={editMember?.memberId || ""} inputProps={{ inputMode: "numeric", maxLength: 8 }} error={dialogMode === "edit" && !/^\d{8}$/.test(editMember?.memberId || "")} helperText={dialogMode === "edit" ? "Exactly 8 digits" : ""} onChange={(event) => setEditMember((current) => ({ ...current, memberId: event.target.value.replace(/\D/g, "").slice(0, 8) }))} required />
+          <TextField disabled={dialogMode === "view"} label="ITS ID" value={editMember?.itsId || ""} inputProps={{ inputMode: "numeric", maxLength: 8 }} error={dialogMode === "edit" && !/^\d{8}$/.test(editMember?.itsId || "")} helperText={dialogMode === "edit" ? "Exactly 8 digits" : ""} onChange={(event) => setEditMember((current) => ({ ...current, itsId: event.target.value.replace(/\D/g, "").slice(0, 8) }))} required />
           <TextField disabled={dialogMode === "view"} label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
           <TextField disabled={dialogMode === "view"} label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
           <TextField disabled={dialogMode === "view"} label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
           <TextField disabled={dialogMode === "view"} select label="Patrol" value={editMember?.patrol || ""} onChange={(event) => setEditMember((current) => ({ ...current, patrol: event.target.value, isPatrolLeader: members.some((member) => member._id !== current._id && member.patrol === event.target.value && member.isPatrolLeader) ? false : current.isPatrolLeader }))}>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</TextField>
-          <TextField disabled={dialogMode === "view"} required={editMember?.patrol !== "Officers"} select label={editMember?.patrol === "Officers" ? "Instrument (optional)" : "Instrument"} value={editMember?.instrument || ""} onChange={(event) => setEditMember((current) => ({ ...current, instrument: event.target.value }))} helperText={dialogMode === "edit" ? (bandInspector ? `Band Inspector is assigned to ${bandInspector.name}.` : editMember?.patrol === "Officers" ? "Officers can be saved without an instrument." : "Select the instrument played by this member.") : ""}>{editMember?.patrol === "Officers" && <MenuItem value=""><em>No instrument</em></MenuItem>}{INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && Boolean(bandInspector)}>{instrument}{instrument === "Band Inspector" && bandInspector ? " (already assigned)" : ""}</MenuItem>)}</TextField>
+          <TextField disabled={dialogMode === "view"} required={editMember?.patrol !== "OFFICERS"} select label={editMember?.patrol === "OFFICERS" ? "Instrument (optional)" : "Instrument"} value={editMember?.instrument || ""} onChange={(event) => setEditMember((current) => ({ ...current, instrument: event.target.value }))} helperText={dialogMode === "edit" ? (bandInspector ? `Band Inspector is assigned to ${bandInspector.name}.` : editMember?.patrol === "OFFICERS" ? "OFFICERS can be saved without an instrument." : "Select the instrument played by this member.") : ""}>{editMember?.patrol === "OFFICERS" && <MenuItem value=""><em>No instrument</em></MenuItem>}{INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && Boolean(bandInspector)}>{instrument}{instrument === "Band Inspector" && bandInspector ? " (already assigned)" : ""}</MenuItem>)}</TextField>
           <TextField disabled={dialogMode === "view"} select label="Member status" value={editMember?.status || "active"} onChange={(event) => setEditMember((current) => ({ ...current, status: event.target.value }))} helperText={dialogMode === "edit" ? (editMember?.status === "inactive" ? "Inactive members are sleeping and cannot sign in." : "Active members can access the member portal.") : ""}><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive (sleeping)</MenuItem></TextField>
           <FormControlLabel control={<Checkbox checked={Boolean(editMember?.isPatrolLeader)} disabled={dialogMode === "view" || Boolean(patrolLeader)} onChange={(event) => setEditMember((current) => ({ ...current, isPatrolLeader: event.target.checked }))} />} label="Patrol leader" />
           {patrolLeader && <Typography variant="caption" color="text.secondary">{editMember?.patrol} is already led by {patrolLeader.name}; this option is unavailable.</Typography>}
           {dialogMode === "edit" && <Button variant="outlined" startIcon={<FaceRetouchingNaturalOutlined />} onClick={() => setEnrollmentMember(editMember)}>{editMember?.faceEnrolled ? "Update face enrollment" : "Enroll face"}</Button>}
         </Stack></DialogContent>
-        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !/^\d{8}$/.test(editMember?.memberId || "") || !editMember?.name?.trim() || (editMember?.patrol !== "Officers" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
+        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !/^\d{8}$/.test(editMember?.itsId || "") || !editMember?.name?.trim() || (editMember?.patrol !== "OFFICERS" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
       </Dialog>
 
       <Dialog open={reviewOpen} onClose={() => !saving && setReviewOpen(false)} fullWidth maxWidth="sm">

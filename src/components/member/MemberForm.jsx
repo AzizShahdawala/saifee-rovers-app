@@ -94,7 +94,7 @@ export default function MemberForm() {
           <Box component="form" onSubmit={handleSubmit(submit)} sx={{ mt: 4 }}>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Member ID (optional)" inputProps={{ inputMode: "numeric", maxLength: 8 }} {...register("memberId", { validate: (value) => !value || /^\d{8}$/.test(value) || "Member ID must contain exactly 8 digits" })} error={!!errors.memberId} helperText={errors.memberId?.message || "An eight-digit ID will be generated automatically if left blank."} />
+                <TextField fullWidth label="ITS ID (optional)" inputProps={{ inputMode: "numeric", maxLength: 8 }} {...register("itsId", { validate: (value) => !value || /^\d{8}$/.test(value) || "ITS ID must contain exactly 8 digits" })} error={!!errors.itsId} helperText={errors.itsId?.message || "An eight-digit ITS ID will be generated automatically if left blank."} />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
@@ -142,14 +142,14 @@ export default function MemberForm() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth select label={formValues.patrol === "Officers" ? "Instrument (optional)" : "Instrument"} defaultValue="" {...register("instrument", { validate: (value) => formValues.patrol === "Officers" || Boolean(value) || "Instrument is required" })} error={!!errors.instrument} helperText={errors.instrument?.message || (formValues.patrol === "Officers" ? "Officers can be registered without an instrument." : "Select the instrument played by this member.")}>
+                <TextField fullWidth select label={formValues.patrol === "OFFICERS" ? "Instrument (optional)" : "Instrument"} defaultValue="" {...register("instrument", { validate: (value) => formValues.patrol === "OFFICERS" || Boolean(value) || "Instrument is required" })} error={!!errors.instrument} helperText={errors.instrument?.message || (formValues.patrol === "OFFICERS" ? "OFFICERS can be registered without an instrument." : "Select the instrument played by this member.")}>
                   {INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && bandInspectorAssigned}>{instrument}{instrument === "Band Inspector" && bandInspectorAssigned ? " (already assigned)" : ""}</MenuItem>)}
                 </TextField>
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
                 <FormControlLabel control={<Checkbox {...register("isPatrolLeader")} disabled={!formValues.patrol || patrolHasLeader} />} label="Patrol leader" />
-                <Typography variant="caption" color="text.secondary" display="block">{patrolHasLeader ? `${formValues.patrol} already has a patrol leader.` : formValues.patrol === "Officers" ? "Patrol leader is optional for Officers." : "Patrol leader is optional; only one member can lead each patrol."}</Typography>
+                <Typography variant="caption" color="text.secondary" display="block">{patrolHasLeader ? `${formValues.patrol} already has a patrol leader.` : formValues.patrol === "OFFICERS" ? "Patrol leader is optional for OFFICERS." : "Patrol leader is optional; only one member can lead each patrol."}</Typography>
               </Grid>
             </Grid>
 
@@ -187,7 +187,7 @@ export default function MemberForm() {
                     </Typography>
 
                     <Typography>
-                      <strong>Member ID:</strong> {formValues.memberId || "Generated automatically"}
+                      <strong>ITS ID:</strong> {formValues.itsId || "Generated automatically"}
                     </Typography>
 
                     <Typography>

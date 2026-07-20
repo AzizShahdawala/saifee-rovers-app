@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, ButtonBase, Stack, Typography } from "@mui/material";
 
 const colors = ["#1976d2", "#16a085", "#f59e0b", "#8b5cf6", "#ef5350"];
 
-export default function PatrolChart({ data = [] }) {
+export default function PatrolChart({ data = [], onPatrolClick }) {
   const items = data.length ? data : [{ label: "No data", value: 1 }];
   const total = items.reduce((sum, item) => sum + (Number(item.value) || 0), 0) || 1;
   const gradient = items.map((item, index) => {
@@ -20,10 +20,10 @@ export default function PatrolChart({ data = [] }) {
         </Box>
       </Box>
       <Stack spacing={1} sx={{ minWidth: 150 }}>
-        {items.map((item, index) => <Stack key={item.label || index} direction="row" alignItems="center" spacing={1}><Box sx={{ width: 10, height: 10, borderRadius: "50%", bgcolor: colors[index % colors.length] }} /><Typography variant="body2" sx={{ flexGrow: 1 }}>{item.label}</Typography><Typography variant="body2" fontWeight={700}>{data.length ? item.value : 0}</Typography></Stack>)}
+        {items.map((item, index) => <ButtonBase key={item.label || index} disabled={!data.length || !onPatrolClick} onClick={() => onPatrolClick?.(item.label)} sx={{ width: "100%", borderRadius: 1.5, px: 1, py: .75, justifyContent: "flex-start", "&:hover": { bgcolor: "action.hover" } }}><Stack direction="row" alignItems="center" spacing={1} sx={{ width: "100%" }}><Box sx={{ width: 10, height: 10, borderRadius: "50%", bgcolor: colors[index % colors.length] }} /><Typography variant="body2" sx={{ flexGrow: 1, textAlign: "left", fontWeight: onPatrolClick ? 700 : 400 }}>{item.label}</Typography><Typography variant="body2" fontWeight={700}>{data.length ? item.value : 0}</Typography></Stack></ButtonBase>)}
       </Stack>
     </Stack>
   );
 }
 
-PatrolChart.propTypes = { data: PropTypes.array };
+PatrolChart.propTypes = { data: PropTypes.array, onPatrolClick: PropTypes.func };

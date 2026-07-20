@@ -1,6 +1,6 @@
 export const PATROLS = [
-  "Fox", "Dove", "Bull", "Peacock", "Officers", "Mentor",
-  "MPL", "Rhino", "Turtle", "Sleeping", "NRI",
+  "FOX", "DOVE", "BULL", "PEACOCK", "OFFICERS", "MENTOR",
+  "MPL", "RHINO", "TURTLE", "SLEEPING", "NRI",
 ];
 
 export const INSTRUMENTS = [
