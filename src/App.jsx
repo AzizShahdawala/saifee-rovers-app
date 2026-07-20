@@ -18,6 +18,7 @@ import MemberAttendance from "./pages/member/MemberAttendance";
 import MemberEvents from "./pages/member/MemberEvents";
 import MemberProfile from "./pages/member/MemberProfile";
 import AdminProfile from "./pages/AdminProfile";
+import PatrolScoreboard from "./pages/scoreboard/PatrolScoreboard";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         <Route path="/events/:id/edit" element={<CreateEvent />} />
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/patrol-scoreboard" element={<PatrolScoreboard />} />
         <Route path="/profile" element={<AdminProfile />} />
         <Route path="/notifications" element={<UtilityPage />} />
       </Route>
