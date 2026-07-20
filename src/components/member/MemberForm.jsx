@@ -94,6 +94,10 @@ export default function MemberForm() {
           <Box component="form" onSubmit={handleSubmit(submit)} sx={{ mt: 4 }}>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth label="Member ID (optional)" inputProps={{ inputMode: "numeric", maxLength: 8 }} {...register("memberId", { validate: (value) => !value || /^\d{8}$/.test(value) || "Member ID must contain exactly 8 digits" })} error={!!errors.memberId} helperText={errors.memberId?.message || "An eight-digit ID will be generated automatically if left blank."} />
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Full Name"
@@ -180,6 +184,10 @@ export default function MemberForm() {
 
                     <Typography>
                       <strong>Email:</strong> {formValues.email || "-"}
+                    </Typography>
+
+                    <Typography>
+                      <strong>Member ID:</strong> {formValues.memberId || "Generated automatically"}
                     </Typography>
 
                     <Typography>

@@ -20,6 +20,8 @@ export default function useMemberForm() {
       if (imageCount === 5) await checkEnrollmentService();
       const formData = new FormData();
 
+      if (data.memberId) formData.append("memberId", data.memberId);
+
       formData.append("name", data.name);
 
       formData.append("phone", data.phone);

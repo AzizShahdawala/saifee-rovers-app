@@ -30,6 +30,7 @@ import {
   PeopleOutlined,
   VisibilityOutlined,
   FaceRetouchingNaturalOutlined,
+  DownloadOutlined,
 } from "@mui/icons-material";
 
 import {
@@ -55,6 +56,8 @@ const Members = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [patrolFilter, setPatrolFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [enrollmentFilter, setEnrollmentFilter] = useState("all");
+  const [exporting, setExporting] = useState(false);
   const [editMember, setEditMember] = useState(null);
   const [originalMember, setOriginalMember] = useState(null);
   const [dialogMode, setDialogMode] = useState("edit");
@@ -63,6 +66,7 @@ const Members = () => {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveNotice, setSaveNotice] = useState("");
+  const [pageError, setPageError] = useState("");
 
   const fetchMembers = async () => {
     try {
@@ -96,7 +100,7 @@ const Members = () => {
     const query = searchText.trim().toLowerCase();
 
     return members.filter((member) => {
-      const matchesQuery = !query || [member.name, member.email, member.phone, member.patrol, member.instrument].some(
+      const matchesQuery = !query || [member.memberId, member.name, member.email, member.phone, member.patrol, member.instrument].some(
         (value) =>
           String(value || "")
             .toLowerCase()
@@ -104,16 +108,18 @@ const Members = () => {
       );
       const matchesPatrol = patrolFilter === "all" || member.patrol === patrolFilter;
       const matchesStatus = statusFilter === "all" || (member.status || "active") === statusFilter;
-      return matchesQuery && matchesPatrol && matchesStatus;
+      const enrolled = Boolean(member.faceEnrolled || member.descriptor?.length > 0 || member.images?.length >= 5);
+      const matchesEnrollment = enrollmentFilter === "all" || enrolled === (enrollmentFilter === "enrolled");
+      return matchesQuery && matchesPatrol && matchesStatus && matchesEnrollment;
     });
-  }, [members, patrolFilter, searchText, statusFilter]);
+  }, [enrollmentFilter, members, patrolFilter, searchText, statusFilter]);
 
   const patrolLeader = editMember ? members.find((member) => member._id !== editMember._id && member.patrol === editMember.patrol && member.isPatrolLeader) : null;
   const bandInspector = editMember ? members.find((member) => member._id !== editMember._id && member.instrument === "Band Inspector") : null;
   const memberChanges = useMemo(() => {
     if (!editMember || !originalMember) return [];
     const fields = [
-      ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["patrol", "Patrol"],
+      ["memberId", "Member ID"], ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["patrol", "Patrol"],
       ["instrument", "Instrument"], ["status", "Member status"], ["isPatrolLeader", "Patrol leader"],
     ];
     const display = (key, value) => key === "isPatrolLeader" ? (value ? "Yes" : "No") : String(value || "Not set");
@@ -185,6 +191,31 @@ const Members = () => {
     setDeleteDialogOpen(true);
   };
 
+  const downloadMembers = async () => {
+    setExporting(true);
+    setPageError("");
+    try {
+      const response = await fetch(`${API_URL}/members/export`, { headers: { Authorization: `Bearer ${localStorage.getItem("token") || ""}` } });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.message || "Unable to download member data");
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `saifee-rovers-members-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      setPageError(error.message);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleDeleteClose = () => {
     if (deleteLoading) {
       return;
@@ -223,6 +254,7 @@ const Members = () => {
   };
 
   const columns = [
+    { id: "memberId", label: "Member ID", sortable: true, minWidth: 115, nowrap: true, render: (member) => member.memberId || "Not assigned" },
     {
       id: "name",
       label: "Member",
@@ -380,16 +412,19 @@ const Members = () => {
         onAction={() => navigate("/members/add")}
       />
 
-      <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mb: 2.5 }}>
-        <Box sx={{ flexGrow: 1, maxWidth: 560 }}>
+      {pageError && <Alert severity="error" onClose={() => setPageError("")} sx={{ mb: 2 }}>{pageError}</Alert>}
+      <Stack direction={{ xs: "column", md: "row" }} spacing={2} useFlexGap flexWrap="wrap" sx={{ mb: 2.5 }}>
+        <Box sx={{ flex: "1 1 320px", minWidth: { xs: 0, sm: 280 } }}>
         <SearchBar
           value={searchText}
           onChange={setSearchText}
-          placeholder="Search by name, email, phone, patrol or instrument..."
+          placeholder="Search by ID, name, email, phone, patrol or instrument..."
         />
         </Box>
         <FormControl size="small" sx={{ minWidth: 160 }}><InputLabel>Patrol</InputLabel><Select value={patrolFilter} label="Patrol" onChange={(event) => setPatrolFilter(event.target.value)}><MenuItem value="all">All patrols</MenuItem>{PATROLS.map((patrol) => <MenuItem key={patrol} value={patrol}>{patrol}</MenuItem>)}</Select></FormControl>
         <FormControl size="small" sx={{ minWidth: 150 }}><InputLabel>Status</InputLabel><Select value={statusFilter} label="Status" onChange={(event) => setStatusFilter(event.target.value)}><MenuItem value="all">All statuses</MenuItem><MenuItem value="active">Active</MenuItem><MenuItem value="inactive">Inactive</MenuItem></Select></FormControl>
+        <FormControl size="small" sx={{ minWidth: 175 }}><InputLabel>Face Enrollment</InputLabel><Select value={enrollmentFilter} label="Face Enrollment" onChange={(event) => setEnrollmentFilter(event.target.value)}><MenuItem value="all">All enrollment</MenuItem><MenuItem value="enrolled">Enrolled</MenuItem><MenuItem value="not-enrolled">Not enrolled</MenuItem></Select></FormControl>
+        <Button variant="outlined" startIcon={<DownloadOutlined />} onClick={downloadMembers} disabled={exporting || loading} sx={{ whiteSpace: "nowrap", minHeight: 40 }}>{exporting ? "Preparing..." : "Download Member Data"}</Button>
       </Stack>
 
       <DataTable
@@ -437,6 +472,7 @@ const Members = () => {
           <Stack alignItems="center" spacing={1} sx={{ pb: 1 }}><Avatar src={editMember?.profileImage || editMember?.imageUrl || undefined} alt={editMember?.name || "Member"} sx={{ width: 112, height: 112, bgcolor: "primary.main", fontSize: "2rem", fontWeight: 800 }}>{editMember?.name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</Avatar><Typography variant="caption" color="text.secondary">Member profile photo</Typography></Stack>
           {saveError && <Alert severity="error">{saveError}</Alert>}
           {saveNotice && <Alert severity="success">{saveNotice}</Alert>}
+          <TextField disabled={dialogMode === "view"} label="Member ID" value={editMember?.memberId || ""} inputProps={{ inputMode: "numeric", maxLength: 8 }} error={dialogMode === "edit" && !/^\d{8}$/.test(editMember?.memberId || "")} helperText={dialogMode === "edit" ? "Exactly 8 digits" : ""} onChange={(event) => setEditMember((current) => ({ ...current, memberId: event.target.value.replace(/\D/g, "").slice(0, 8) }))} required />
           <TextField disabled={dialogMode === "view"} label="Full name" value={editMember?.name || ""} onChange={(event) => setEditMember((current) => ({ ...current, name: event.target.value }))} required />
           <TextField disabled={dialogMode === "view"} label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
           <TextField disabled={dialogMode === "view"} label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
@@ -447,7 +483,7 @@ const Members = () => {
           {patrolLeader && <Typography variant="caption" color="text.secondary">{editMember?.patrol} is already led by {patrolLeader.name}; this option is unavailable.</Typography>}
           {dialogMode === "edit" && <Button variant="outlined" startIcon={<FaceRetouchingNaturalOutlined />} onClick={() => setEnrollmentMember(editMember)}>{editMember?.faceEnrolled ? "Update face enrollment" : "Enroll face"}</Button>}
         </Stack></DialogContent>
-        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !editMember?.name?.trim() || (editMember?.patrol !== "Officers" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
+        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !/^\d{8}$/.test(editMember?.memberId || "") || !editMember?.name?.trim() || (editMember?.patrol !== "Officers" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
       </Dialog>
 
       <Dialog open={reviewOpen} onClose={() => !saving && setReviewOpen(false)} fullWidth maxWidth="sm">
