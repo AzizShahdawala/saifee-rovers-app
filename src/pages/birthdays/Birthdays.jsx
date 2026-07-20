@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Avatar, Box, Chip, Grid, MenuItem, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { CakeOutlined, CalendarMonthOutlined, CelebrationOutlined, FamilyRestroomOutlined, PersonOutlined } from "@mui/icons-material";
+import { Alert, Avatar, Box, Button, Chip, Grid, MenuItem, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { CakeOutlined, CalendarMonthOutlined, CelebrationOutlined, DownloadOutlined, FamilyRestroomOutlined, PersonOutlined } from "@mui/icons-material";
 import API from "../../api/axios";
 import { DataTable, PageHeader } from "../../components/common";
 
@@ -12,11 +12,41 @@ const typeMeta = {
 };
 const birthdayDate = (value) => new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "long" });
 const proximity = (days) => days === 0 ? "Today" : days === 1 ? "Tomorrow" : days > 1 ? `In ${days} days` : `${Math.abs(days)} days ago`;
+const initials = (name) => name.split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
+
+const downloadBirthdayCard = (item) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080; canvas.height = 1080;
+  const context = canvas.getContext("2d");
+  const gradient = context.createLinearGradient(0, 0, 1080, 1080);
+  gradient.addColorStop(0, "#4C1D95"); gradient.addColorStop(.5, "#BE185D"); gradient.addColorStop(1, "#F97316");
+  context.fillStyle = gradient; context.fillRect(0, 0, 1080, 1080);
+  const colors = ["#FDE68A", "#F9A8D4", "#93C5FD", "#A7F3D0", "#FFFFFF"];
+  for (let index = 0; index < 70; index += 1) {
+    context.fillStyle = colors[index % colors.length]; context.globalAlpha = .75;
+    context.save(); context.translate((index * 157) % 1080, (index * 263) % 1080); context.rotate(index * .7);
+    context.fillRect(-5, -14, 10, 28); context.restore();
+  }
+  context.globalAlpha = 1; context.fillStyle = "rgba(255,255,255,.13)";
+  context.beginPath(); context.arc(540, 470, 355, 0, Math.PI * 2); context.fill();
+  context.fillStyle = "rgba(255,255,255,.2)"; context.beginPath(); context.arc(540, 400, 135, 0, Math.PI * 2); context.fill();
+  context.fillStyle = "#FFFFFF"; context.textAlign = "center"; context.textBaseline = "middle";
+  context.font = "900 94px Arial"; context.fillText(initials(item.name), 540, 405);
+  context.font = "700 40px Arial"; context.fillText("SAIFEE ROVERS", 540, 105);
+  context.font = "900 76px Arial"; context.fillText("HAPPY BIRTHDAY", 540, 625);
+  context.font = `900 ${item.name.length > 24 ? 50 : 64}px Arial`; context.fillText(item.name, 540, 720);
+  context.font = "500 35px Arial"; context.fillText("Wishing you a wonderful year filled with", 540, 810);
+  context.fillText("happiness, success and memorable adventures!", 540, 858);
+  context.font = "700 30px Arial"; context.fillText(`${typeMeta[item.type].label} • ${item.patrol || "Rover Family"}`, 540, 958);
+  const link = document.createElement("a");
+  link.download = `birthday-wish-${item.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.png`;
+  link.href = canvas.toDataURL("image/png"); link.click();
+};
 
 export default function Birthdays() {
   const [view, setView] = useState("today");
   const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [data, setData] = useState({ birthdays: [], summary: { today: 0, week: 0, month: 0, totalPeople: 0 } });
+  const [data, setData] = useState({ birthdays: [], todayBirthdays: [], summary: { today: 0, week: 0, month: 0, totalPeople: 0 } });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -60,6 +90,26 @@ export default function Birthdays() {
     </Paper>
 
     <Grid container spacing={2} sx={{ mb: 3 }}>{cards.map(([label, value, color, icon]) => <Grid size={{ xs: 6, md: 3 }} key={label}><Paper sx={{ p: 2.25, border: "1px solid", borderColor: "divider", height: "100%" }}><Stack direction="row" spacing={1.5} alignItems="center"><Avatar sx={{ bgcolor: color }}>{icon}</Avatar><Box><Typography variant="h4" fontWeight={950}>{value}</Typography><Typography color="text.secondary" fontWeight={700}>{label}</Typography></Box></Stack></Paper></Grid>)}</Grid>
+
+    {data.todayBirthdays.length > 0 && <Box sx={{ mb: 3 }}>
+      <Stack direction="row" alignItems="end" justifyContent="space-between" sx={{ mb: 1.5 }}>
+        <Box><Typography variant="h5" fontWeight={950}>Today&apos;s celebrations</Typography><Typography color="text.secondary">Download a greeting card and share the birthday joy.</Typography></Box>
+        <Chip color="error" icon={<CakeOutlined />} label={`${data.todayBirthdays.length} celebrating`} sx={{ display: { xs: "none", sm: "flex" }, fontWeight: 800 }} />
+      </Stack>
+      <Box sx={{ display: "flex", gap: 2.5, overflowX: "auto", pb: 1.5, scrollSnapType: "x mandatory", scrollbarWidth: "thin" }}>
+        {data.todayBirthdays.map((item) => <Paper key={`wish-${item.id}`} sx={{ flex: "0 0 auto", width: { xs: "88vw", sm: 390 }, minHeight: 440, p: 3, color: "white", textAlign: "center", scrollSnapAlign: "start", overflow: "hidden", position: "relative", background: "linear-gradient(140deg, #4C1D95, #BE185D 58%, #F97316)", border: "1px solid rgba(255,255,255,.25)" }}>
+          <CelebrationOutlined sx={{ position: "absolute", left: -20, top: -20, fontSize: 130, opacity: .13, transform: "rotate(-18deg)" }} />
+          <CakeOutlined sx={{ position: "absolute", right: -20, bottom: 25, fontSize: 150, opacity: .12, transform: "rotate(12deg)" }} />
+          <Typography variant="overline" fontWeight={900} letterSpacing={2}>Saifee Rovers</Typography>
+          <Avatar sx={{ width: 112, height: 112, mx: "auto", my: 2, bgcolor: "rgba(255,255,255,.2)", border: "3px solid rgba(255,255,255,.75)", fontSize: 38, fontWeight: 900 }}>{initials(item.name)}</Avatar>
+          <Typography variant="h4" fontWeight={950}>Happy Birthday!</Typography>
+          <Typography variant="h5" fontWeight={900} sx={{ mt: 1 }}>{item.name}</Typography>
+          <Typography sx={{ mt: 2, opacity: .9, minHeight: 52 }}>Wishing you a wonderful year filled with happiness, success and memorable adventures!</Typography>
+          <Typography variant="caption" fontWeight={800} sx={{ display: "block", mt: 1.5, opacity: .85 }}>{typeMeta[item.type].label} • {item.patrol || "Rover Family"}</Typography>
+          <Button variant="contained" startIcon={<DownloadOutlined />} onClick={() => downloadBirthdayCard(item)} sx={{ mt: 2.5, bgcolor: "white", color: "#7C1D83", fontWeight: 900, "&:hover": { bgcolor: "#FFF7ED" } }}>Download Card</Button>
+        </Paper>)}
+      </Box>
+    </Box>}
 
     <Paper sx={{ p: 2, mb: 3, border: "1px solid", borderColor: "divider" }}><Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems={{ md: "center" }}><Typography fontWeight={900} sx={{ mr: { md: "auto" } }}>Show birthdays</Typography><ToggleButtonGroup exclusive value={view} onChange={(_, value) => value && setView(value)} size="small"><ToggleButton value="today">Today</ToggleButton><ToggleButton value="week">Next 7 days</ToggleButton><ToggleButton value="month">Month</ToggleButton></ToggleButtonGroup>{view === "month" && <TextField select size="small" label="Month" value={month} onChange={(event) => setMonth(Number(event.target.value))} sx={{ minWidth: 160 }}>{months.map((name, index) => <MenuItem value={index + 1} key={name}>{name}</MenuItem>)}</TextField>}</Stack></Paper>
 
