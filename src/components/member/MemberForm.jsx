@@ -13,11 +13,13 @@ import {
   Box,
   Checkbox,
   FormControlLabel,
+  IconButton,
   MenuItem,
 } from "@mui/material";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { AddCircleOutlineOutlined as AddCircleOutline, RemoveCircleOutlineOutlined as RemoveCircleOutline } from "@mui/icons-material";
 
 import WebcamCapture from "./WebcamCapture";
 import ImagePreview from "./ImagePreview";
@@ -47,6 +49,7 @@ export default function MemberForm() {
     formState: { errors },
   } = useForm();
   const formValues = useWatch({ control, defaultValue: {} });
+  const { fields: childFields, append: addChild, remove: removeChild, replace: replaceChildren } = useFieldArray({ control, name: "children" });
   const patrolHasLeader = useMemo(() => members.some((member) => member.patrol === formValues.patrol && member.isPatrolLeader), [formValues.patrol, members]);
   const bandInspectorAssigned = useMemo(() => members.some((member) => member.instrument === "Band Inspector"), [members]);
 
@@ -58,6 +61,10 @@ export default function MemberForm() {
   useEffect(() => {
     if (patrolHasLeader) setValue("isPatrolLeader", false);
   }, [patrolHasLeader, setValue]);
+
+  useEffect(() => {
+    if (!formValues.hasChildren && childFields.length) replaceChildren([]);
+  }, [childFields.length, formValues.hasChildren, replaceChildren]);
 
   const {
     loading,
@@ -156,6 +163,24 @@ export default function MemberForm() {
               </Grid>}
 
               <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth select label="Marital Status" defaultValue="" {...register("maritalStatus", { required: "Marital status is required" })} error={!!errors.maritalStatus} helperText={errors.maritalStatus?.message}>
+                  <MenuItem value="MARRIED">Married</MenuItem><MenuItem value="UNMARRIED">Unmarried</MenuItem>
+                </TextField>
+              </Grid>
+
+              {formValues.maritalStatus === "MARRIED" && <>
+                <Grid size={{ xs: 12, md: 6 }}><TextField fullWidth label="Spouse Name" {...register("spouseName", { required: "Spouse name is required" })} error={!!errors.spouseName} helperText={errors.spouseName?.message} /></Grid>
+                <Grid size={{ xs: 12, md: 6 }}><TextField fullWidth type="date" label="Spouse Date of Birth" slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().slice(0, 10) } }} {...register("spouseDateOfBirth", { required: "Spouse date of birth is required" })} error={!!errors.spouseDateOfBirth} helperText={errors.spouseDateOfBirth?.message} /></Grid>
+                <Grid size={12}><FormControlLabel control={<Checkbox {...register("hasChildren")} />} label="Children" /></Grid>
+                {formValues.hasChildren && <Grid size={12}><Box sx={{ p: 2, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
+                  <Typography variant="subtitle1" fontWeight={800} sx={{ mb: 1.5 }}>Children details</Typography>
+                  {childFields.map((field, index) => <Grid container spacing={2} key={field.id} sx={{ mb: 1.5 }}><Grid size={{ xs: 12, md: 6 }}><TextField fullWidth label={`Child ${index + 1} Name`} {...register(`children.${index}.name`, { required: "Child name is required" })} error={!!errors.children?.[index]?.name} helperText={errors.children?.[index]?.name?.message} /></Grid><Grid size={{ xs: 10, md: 5 }}><TextField fullWidth type="date" label="Date of Birth" slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().slice(0, 10) } }} {...register(`children.${index}.dateOfBirth`, { required: "Date of birth is required" })} error={!!errors.children?.[index]?.dateOfBirth} helperText={errors.children?.[index]?.dateOfBirth?.message} /></Grid><Grid size={{ xs: 2, md: 1 }}><IconButton color="error" onClick={() => removeChild(index)} aria-label={`Remove child ${index + 1}`}><RemoveCircleOutline /></IconButton></Grid></Grid>)}
+                  <Button type="button" startIcon={<AddCircleOutline />} onClick={() => addChild({ name: "", dateOfBirth: "" })}>Add child</Button>
+                  {!childFields.length && <Typography variant="caption" color="error" sx={{ ml: 1 }}>Add at least one child when Children is selected.</Typography>}
+                </Box></Grid>}
+              </>}
+
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField fullWidth select label={formValues.patrol === "OFFICERS" ? "Instrument (optional)" : "Instrument"} defaultValue="" {...register("instrument", { validate: (value) => formValues.patrol === "OFFICERS" || Boolean(value) || "Instrument is required" })} error={!!errors.instrument} helperText={errors.instrument?.message || (formValues.patrol === "OFFICERS" ? "OFFICERS can be registered without an instrument." : "Select the instrument played by this member.")}>
                   {INSTRUMENTS.map((instrument) => <MenuItem key={instrument} value={instrument} disabled={instrument === "Band Inspector" && bandInspectorAssigned}>{instrument}{instrument === "Band Inspector" && bandInspectorAssigned ? " (already assigned)" : ""}</MenuItem>)}
                 </TextField>
@@ -201,6 +226,10 @@ export default function MemberForm() {
                     <Typography><strong>Profession:</strong> {professionLabel(formValues.profession)}</Typography>
 
                     {formValues.profession !== "RETIRED" && <Typography><strong>{PROFESSION_DETAIL_LABELS[formValues.profession] || "Profession details"}:</strong> {formValues.professionDetails || "-"}</Typography>}
+
+                    <Typography><strong>Marital Status:</strong> {formValues.maritalStatus === "MARRIED" ? "Married" : formValues.maritalStatus === "UNMARRIED" ? "Unmarried" : "-"}</Typography>
+
+                    {formValues.maritalStatus === "MARRIED" && <><Typography><strong>Spouse:</strong> {formValues.spouseName || "-"}</Typography><Typography><strong>Children:</strong> {formValues.children?.length || 0}</Typography></>}
 
                     <Typography>
                       <strong>Email:</strong> {formValues.email || "-"}
@@ -322,7 +351,7 @@ export default function MemberForm() {
                 type="submit"
                 variant="contained"
                 size="large"
-                disabled={loading || (Object.keys(capturedImages).length > 0 && Object.keys(capturedImages).length !== 5)}
+                disabled={loading || (formValues.hasChildren && !childFields.length) || (Object.keys(capturedImages).length > 0 && Object.keys(capturedImages).length !== 5)}
                 sx={{
                   width: { xs: "100%", sm: 300 },
                   height: 50,

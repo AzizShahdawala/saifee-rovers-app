@@ -32,6 +32,14 @@ export default function useMemberForm() {
 
       if (data.professionDetails) formData.append("professionDetails", data.professionDetails);
 
+      formData.append("maritalStatus", data.maritalStatus);
+
+      if (data.spouseName) formData.append("spouseName", data.spouseName);
+
+      if (data.spouseDateOfBirth) formData.append("spouseDateOfBirth", data.spouseDateOfBirth);
+
+      formData.append("children", JSON.stringify(data.children || []));
+
       formData.append("email", data.email);
 
       formData.append("patrol", data.patrol);
