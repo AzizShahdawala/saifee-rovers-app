@@ -199,7 +199,13 @@ const Members = () => {
     setExporting(true);
     setPageError("");
     try {
-      const response = await fetch(`${API_URL}/members/export`, { headers: { Authorization: `Bearer ${localStorage.getItem("token") || ""}` } });
+      const params = new URLSearchParams();
+      if (searchText.trim()) params.set("search", searchText.trim());
+      if (patrolFilter !== "all") params.set("patrol", patrolFilter);
+      if (statusFilter !== "all") params.set("status", statusFilter);
+      if (enrollmentFilter !== "all") params.set("faceEnrolled", String(enrollmentFilter === "enrolled"));
+      const query = params.toString();
+      const response = await fetch(`${API_URL}/members/export${query ? `?${query}` : ""}`, { headers: { Authorization: `Bearer ${localStorage.getItem("token") || ""}` } });
       if (!response.ok) {
         const result = await response.json().catch(() => ({}));
         throw new Error(result.message || "Unable to download member data");
