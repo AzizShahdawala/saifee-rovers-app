@@ -5,6 +5,7 @@ import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
 import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
+import CollectionsOutlinedIcon from "@mui/icons-material/CollectionsOutlined";
 
 const navigation = [
   {
@@ -41,6 +42,11 @@ const navigation = [
     title: "Birthdays",
     icon: CakeOutlinedIcon,
     path: "/birthdays",
+  },
+  {
+    title: "Gallery",
+    icon: CollectionsOutlinedIcon,
+    path: "/gallery",
   },
 ];
 

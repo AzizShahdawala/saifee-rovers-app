@@ -1,5 +1,6 @@
 import API from "../api/axios";
 
+export const getGalleryMedia = (type = "all") => API.get("/event-media", { params: { type } });
 export const getEventMedia = (eventId) => API.get(`/event-media/${eventId}`);
 export const uploadEventMedia = (eventId, files, onUploadProgress) => {
   const form = new FormData();

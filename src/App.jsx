@@ -20,6 +20,7 @@ import MemberProfile from "./pages/member/MemberProfile";
 import AdminProfile from "./pages/AdminProfile";
 import PatrolScoreboard from "./pages/scoreboard/PatrolScoreboard";
 import Birthdays from "./pages/birthdays/Birthdays";
+import Gallery from "./pages/gallery/Gallery";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/patrol-scoreboard" element={<PatrolScoreboard />} />
         <Route path="/birthdays" element={<Birthdays />} />
+        <Route path="/gallery" element={<Gallery />} />
         <Route path="/profile" element={<AdminProfile />} />
         <Route path="/notifications" element={<UtilityPage />} />
       </Route>
