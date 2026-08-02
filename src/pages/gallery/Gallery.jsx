@@ -18,6 +18,7 @@ import {
   BrokenImageOutlined,
   CloseOutlined,
   CollectionsOutlined,
+  DownloadOutlined,
   ImageOutlined,
   PlayArrowRounded,
   VideocamOutlined,
@@ -113,7 +114,7 @@ export default function Gallery() {
 
     <Dialog open={Boolean(selected)} onClose={() => setSelected(null)} fullScreen PaperProps={{ sx: { bgcolor: "rgba(0,0,0,.96)" } }}>
       <DialogContent sx={{ p: 0, display: "grid", placeItems: "center", position: "relative" }}>
-        <IconButton onClick={() => setSelected(null)} aria-label="Close preview" sx={{ position: "absolute", zIndex: 1, top: 16, right: 16, color: "white", bgcolor: "rgba(255,255,255,.12)" }}><CloseOutlined /></IconButton>
+        <Stack direction="row" spacing={1} sx={{ position: "absolute", zIndex: 1, top: 16, right: 16 }}><Button component="a" href={selected?.downloadUrl || selected?.url} variant="contained" color="inherit" startIcon={<DownloadOutlined />} sx={{ bgcolor: "white", color: "grey.900", "&:hover": { bgcolor: "grey.100" } }}>Download</Button><IconButton onClick={() => setSelected(null)} aria-label="Close preview" sx={{ color: "white", bgcolor: "rgba(255,255,255,.12)" }}><CloseOutlined /></IconButton></Stack>
         {selected?.mediaType === "video" ? <Box component="video" src={selected?.url} controls autoPlay sx={{ maxWidth: "100%", maxHeight: "100vh" }} /> : <Box component="img" src={selected?.url} alt={selected?.originalName || "Event photo"} sx={{ maxWidth: "100%", maxHeight: "100vh", objectFit: "contain" }} />}
       </DialogContent>
     </Dialog>
