@@ -53,6 +53,8 @@ function App() {
         <Route path="/member" element={<MemberDashboard />} />
         <Route path="/member/attendance" element={<MemberAttendance />} />
         <Route path="/member/events" element={<MemberEvents />} />
+        <Route path="/member/gallery" element={<Gallery />} />
+        <Route path="/member/patrol-dashboard" element={<PatrolScoreboard readOnly />} />
         <Route path="/member/profile" element={<MemberProfile />} />
       </Route>
 

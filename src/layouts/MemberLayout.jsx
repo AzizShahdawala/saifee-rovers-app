@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AppBar, Avatar, Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material";
-import { DashboardOutlined, EventOutlined, FactCheckOutlined, LogoutOutlined, MenuOutlined, PersonOutlined } from "@mui/icons-material";
+import { CollectionsOutlined, DashboardOutlined, EventOutlined, FactCheckOutlined, LeaderboardOutlined, LogoutOutlined, MenuOutlined, PersonOutlined } from "@mui/icons-material";
 import logo from "../assets/logo.png";
 import { clearSession, getStoredUser } from "../utils/auth";
 
 const width = 250;
 const links = [
-  { label: "Overview", path: "/member", icon: DashboardOutlined },
-  { label: "My attendance", path: "/member/attendance", icon: FactCheckOutlined },
+  { label: "Dashboard", path: "/member", icon: DashboardOutlined },
+  { label: "My Attendance", path: "/member/attendance", icon: FactCheckOutlined },
   { label: "Events", path: "/member/events", icon: EventOutlined },
+  { label: "Gallery", path: "/member/gallery", icon: CollectionsOutlined },
+  { label: "Patrol Dashboard", path: "/member/patrol-dashboard", icon: LeaderboardOutlined },
 ];
 
 export default function MemberLayout() {
