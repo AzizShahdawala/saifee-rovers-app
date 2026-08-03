@@ -21,11 +21,13 @@ import PatrolScoreboard from "./pages/scoreboard/PatrolScoreboard";
 import Birthdays from "./pages/birthdays/Birthdays";
 import Gallery from "./pages/gallery/Gallery";
 import Anniversaries from "./pages/anniversaries/Anniversaries";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
 
       <Route
         element={

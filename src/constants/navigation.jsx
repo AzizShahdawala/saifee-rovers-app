@@ -30,7 +30,7 @@ const navigation = [
     path: "/attendance",
   },
   {
-    title: "Reports",
+    title: "Attendance Reports",
     icon: AssessmentIcon,
     path: "/reports",
   },

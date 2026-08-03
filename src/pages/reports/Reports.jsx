@@ -20,7 +20,6 @@ import {
   StatCard,
   StatusChip,
 } from "../../components/common";
-import AttendanceChart from "../../components/charts/AttendanceChart";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -43,6 +42,7 @@ const Reports = () => {
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [eventFilter, setEventFilter] = useState("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
@@ -80,6 +80,7 @@ const Reports = () => {
     return records.filter((record) => {
       const memberName = record.member?.name || record.memberName;
       const eventTitle = record.event?.title || record.eventTitle;
+      const eventId = record.event?._id || record.eventId || eventTitle;
 
       const matchesQuery = !query || [
         memberName,
@@ -94,22 +95,33 @@ const Reports = () => {
       const status = String(record.status || "present").toLowerCase();
       const date = new Date(record.timestamp || record.createdAt);
       const matchesStatus = statusFilter === "all" || status === statusFilter;
+      const matchesEvent = eventFilter === "all" || String(eventId) === eventFilter;
       const matchesFrom = !fromDate || date >= new Date(`${fromDate}T00:00:00`);
       const matchesTo = !toDate || date <= new Date(`${toDate}T23:59:59`);
-      return matchesQuery && matchesStatus && matchesFrom && matchesTo;
+      return matchesQuery && matchesStatus && matchesEvent && matchesFrom && matchesTo;
     });
-  }, [fromDate, records, searchText, statusFilter, toDate]);
+  }, [eventFilter, fromDate, records, searchText, statusFilter, toDate]);
 
-  const presentCount = records.filter(
+  const eventOptions = useMemo(() => {
+    const uniqueEvents = new Map();
+    records.forEach((record) => {
+      const title = record.event?.title || record.eventTitle || "Unknown event";
+      const id = String(record.event?._id || record.eventId || title);
+      uniqueEvents.set(id, title);
+    });
+    return [...uniqueEvents.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  }, [records]);
+
+  const presentCount = filteredRecords.filter(
     (record) => String(record.status || "present").toLowerCase() === "present",
   ).length;
 
-  const absentCount = records.filter(
+  const absentCount = filteredRecords.filter(
     (record) => String(record.status || "").toLowerCase() === "absent",
   ).length;
 
   const attendanceRate =
-    records.length > 0 ? Math.round((presentCount / records.length) * 100) : 0;
+    filteredRecords.length > 0 ? Math.round((presentCount / filteredRecords.length) * 100) : 0;
 
   const exportRows = filteredRecords.map((record) => ({ Member: record.member?.name || record.memberName || "", Patrol: record.member?.patrol || record.patrol || "", Event: record.event?.title || record.eventTitle || "", Status: record.status || "present", Timestamp: formatDateTime(record.timestamp || record.createdAt) }));
   const handleExcelExport = () => {
@@ -117,13 +129,10 @@ const Reports = () => {
     const worksheet = XLSX.utils.json_to_sheet(exportRows);
     worksheet["!cols"] = [{ wch: 24 }, { wch: 18 }, { wch: 28 }, { wch: 12 }, { wch: 24 }];
     XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
-    XLSX.writeFile(workbook, `attendance-report-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    const selectedEvent = eventOptions.find(([id]) => id === eventFilter)?.[1] || "all-events";
+    const safeEvent = selectedEvent.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    XLSX.writeFile(workbook, `attendance-report-${safeEvent}-${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
-
-  const chartData = useMemo(() => {
-    const days = Array.from({ length: 7 }, (_, index) => { const date = new Date(); date.setDate(date.getDate() - (6 - index)); return date; });
-    return days.map((date) => ({ label: date.toLocaleDateString("en-IN", { weekday: "short" }), value: records.filter((record) => new Date(record.timestamp || record.createdAt).toDateString() === date.toDateString() && String(record.status || "present").toLowerCase() === "present").length }));
-  }, [records]);
 
   const columns = [
     {
@@ -171,7 +180,7 @@ const Reports = () => {
     <Box className="reports-page">
       <PageHeader
         title="Attendance Reports"
-        subtitle="Review member attendance records and export event reports."
+        subtitle="Filter attendance by event, status or date and export exactly what is shown."
         breadcrumbs={[
           {
             label: "Dashboard",
@@ -203,7 +212,7 @@ const Reports = () => {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Total Records"
-            value={records.length}
+            value={filteredRecords.length}
             icon={<AssessmentOutlined />}
             color="primary"
             loading={loading}
@@ -241,18 +250,17 @@ const Reports = () => {
         </Grid>
       </Grid>
 
-      <DashboardCard title="Seven-day Attendance" subtitle="Present check-ins by day" sx={{ mb: 3 }}><AttendanceChart data={chartData} /></DashboardCard>
-
       <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mb: 2.5 }}>
+        <TextField select size="small" label="Event" value={eventFilter} onChange={(event) => setEventFilter(event.target.value)} sx={{ minWidth: { md: 240 } }}><MenuItem value="all">All events</MenuItem>{eventOptions.map(([id, title]) => <MenuItem key={id} value={id}>{title}</MenuItem>)}</TextField>
         <TextField select size="small" label="Status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} sx={{ maxWidth: { md: 180 } }}><MenuItem value="all">All statuses</MenuItem><MenuItem value="present">Present</MenuItem><MenuItem value="absent">Absent</MenuItem><MenuItem value="late">Late</MenuItem><MenuItem value="excused">Excused</MenuItem></TextField>
         <TextField size="small" label="From" type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} InputLabelProps={{ shrink: true }} sx={{ maxWidth: { md: 180 } }} />
         <TextField size="small" label="To" type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} InputLabelProps={{ shrink: true }} sx={{ maxWidth: { md: 180 } }} />
-        {(statusFilter !== "all" || fromDate || toDate) && <Button color="inherit" onClick={() => { setStatusFilter("all"); setFromDate(""); setToDate(""); }}>Clear filters</Button>}
+        {(eventFilter !== "all" || statusFilter !== "all" || fromDate || toDate) && <Button color="inherit" onClick={() => { setEventFilter("all"); setStatusFilter("all"); setFromDate(""); setToDate(""); }}>Clear filters</Button>}
       </Stack>
 
       <DashboardCard
         title="Attendance Records"
-        subtitle="Search and review attendance by member and event"
+        subtitle={`${filteredRecords.length} filtered record${filteredRecords.length === 1 ? "" : "s"} — exports use this same result set`}
         noPadding
         action={
           <SearchBar
