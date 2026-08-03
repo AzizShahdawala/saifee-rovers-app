@@ -23,7 +23,7 @@ API.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       clearSession();
-      window.location.hash = "#/";
+      window.location.hash = "#/login";
     }
 
     return Promise.reject(error);

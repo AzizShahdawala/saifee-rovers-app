@@ -22,6 +22,7 @@ import Birthdays from "./pages/birthdays/Birthdays";
 import Gallery from "./pages/gallery/Gallery";
 import Anniversaries from "./pages/anniversaries/Anniversaries";
 import LandingPage from "./pages/LandingPage";
+import Receipts from "./pages/receipts/Receipts";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
         <Route path="/anniversaries" element={<Anniversaries />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/profile" element={<AdminProfile />} />
+        <Route path="/receipts" element={<Receipts />} />
       </Route>
 
       <Route element={<ProtectedRoute role="member"><MemberLayout /></ProtectedRoute>}>
@@ -60,6 +62,7 @@ function App() {
         <Route path="/member/birthdays" element={<Birthdays />} />
         <Route path="/member/anniversaries" element={<Anniversaries />} />
         <Route path="/member/profile" element={<MemberProfile />} />
+        <Route path="/member/receipts" element={<Receipts />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
