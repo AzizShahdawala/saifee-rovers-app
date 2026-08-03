@@ -171,6 +171,7 @@ export default function MemberForm() {
               {formValues.maritalStatus === "MARRIED" && <>
                 <Grid size={{ xs: 12, md: 6 }}><TextField fullWidth label="Spouse Name" {...register("spouseName", { required: "Spouse name is required" })} error={!!errors.spouseName} helperText={errors.spouseName?.message} /></Grid>
                 <Grid size={{ xs: 12, md: 6 }}><TextField fullWidth type="date" label="Spouse Date of Birth" slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().slice(0, 10) } }} {...register("spouseDateOfBirth", { required: "Spouse date of birth is required" })} error={!!errors.spouseDateOfBirth} helperText={errors.spouseDateOfBirth?.message} /></Grid>
+                <Grid size={{ xs: 12, md: 6 }}><TextField fullWidth type="date" label="Marriage Date" slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().slice(0, 10) } }} {...register("marriageDate", { required: "Marriage date is required" })} error={!!errors.marriageDate} helperText={errors.marriageDate?.message} /></Grid>
                 <Grid size={12}><FormControlLabel control={<Checkbox {...register("hasChildren")} />} label="Children" /></Grid>
                 {formValues.hasChildren && <Grid size={12}><Box sx={{ p: 2, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
                   <Typography variant="subtitle1" fontWeight={800} sx={{ mb: 1.5 }}>Children details</Typography>
@@ -229,7 +230,7 @@ export default function MemberForm() {
 
                     <Typography><strong>Marital Status:</strong> {formValues.maritalStatus === "MARRIED" ? "Married" : formValues.maritalStatus === "UNMARRIED" ? "Unmarried" : "-"}</Typography>
 
-                    {formValues.maritalStatus === "MARRIED" && <><Typography><strong>Spouse:</strong> {formValues.spouseName || "-"}</Typography><Typography><strong>Children:</strong> {formValues.children?.length || 0}</Typography></>}
+                    {formValues.maritalStatus === "MARRIED" && <><Typography><strong>Spouse:</strong> {formValues.spouseName || "-"}</Typography><Typography><strong>Marriage Date:</strong> {formValues.marriageDate || "-"}</Typography><Typography><strong>Children:</strong> {formValues.children?.length || 0}</Typography></>}
 
                     <Typography>
                       <strong>Email:</strong> {formValues.email || "-"}

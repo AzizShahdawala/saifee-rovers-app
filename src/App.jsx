@@ -8,7 +8,6 @@ import Events from "./pages/events/Events";
 import CreateEvent from "./pages/CreateEvent";
 import Attendance from "./pages/Attendance";
 import Reports from "./pages/reports/Reports";
-import UtilityPage from "./pages/UtilityPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -21,6 +20,7 @@ import AdminProfile from "./pages/AdminProfile";
 import PatrolScoreboard from "./pages/scoreboard/PatrolScoreboard";
 import Birthdays from "./pages/birthdays/Birthdays";
 import Gallery from "./pages/gallery/Gallery";
+import Anniversaries from "./pages/anniversaries/Anniversaries";
 
 function App() {
   return (
@@ -44,9 +44,9 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/patrol-scoreboard" element={<PatrolScoreboard />} />
         <Route path="/birthdays" element={<Birthdays />} />
+        <Route path="/anniversaries" element={<Anniversaries />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/profile" element={<AdminProfile />} />
-        <Route path="/notifications" element={<UtilityPage />} />
       </Route>
 
       <Route element={<ProtectedRoute role="member"><MemberLayout /></ProtectedRoute>}>
@@ -56,6 +56,7 @@ function App() {
         <Route path="/member/gallery" element={<Gallery />} />
         <Route path="/member/patrol-dashboard" element={<PatrolScoreboard readOnly />} />
         <Route path="/member/birthdays" element={<Birthdays />} />
+        <Route path="/member/anniversaries" element={<Anniversaries />} />
         <Route path="/member/profile" element={<MemberProfile />} />
       </Route>
 

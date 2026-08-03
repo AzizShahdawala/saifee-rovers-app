@@ -8,7 +8,6 @@ import {
   Box,
   IconButton,
   Avatar,
-  Badge,
   Tooltip,
   Menu,
   MenuItem,
@@ -18,43 +17,12 @@ import {
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
-import EventAvailableIcon from "@mui/icons-material/EventAvailable";
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 
 import { getNavigationTitle } from "../../constants/navigation";
-
-const notifications = [
-  {
-    id: 1,
-    title: "Attendance recorded",
-    description: "12 members checked in for Band Practice.",
-    time: "5 minutes ago",
-    icon: <CheckCircleOutlinedIcon fontSize="small" />,
-    color: "success.main",
-  },
-  {
-    id: 2,
-    title: "Upcoming event",
-    description: "General Meeting starts today at 7:00 PM.",
-    time: "30 minutes ago",
-    icon: <EventAvailableIcon fontSize="small" />,
-    color: "primary.main",
-  },
-  {
-    id: 3,
-    title: "New member registered",
-    description: "A new scout member was added successfully.",
-    time: "2 hours ago",
-    icon: <PersonAddAlt1Icon fontSize="small" />,
-    color: "info.main",
-  },
-];
 
 export default function TopBar({ setMobileOpen, onMenuClick }) {
   const location = useLocation();
@@ -66,8 +34,6 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
   );
 
   const [profileAnchor, setProfileAnchor] = useState(null);
-
-  const [notificationAnchor, setNotificationAnchor] = useState(null);
 
   const [dateTime, setDateTime] = useState(new Date());
   const [, setSessionVersion] = useState(0);
@@ -141,14 +107,6 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
 
   const closeProfile = () => {
     setProfileAnchor(null);
-  };
-
-  const openNotifications = (event) => {
-    setNotificationAnchor(event.currentTarget);
-  };
-
-  const closeNotifications = () => {
-    setNotificationAnchor(null);
   };
 
   const logout = () => {
@@ -229,143 +187,6 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
         </Box>
 
         <Box sx={{ flexGrow: 1 }} />
-
-        {/* Notifications */}
-        <Tooltip title="Notifications">
-          <IconButton
-            onClick={openNotifications}
-            aria-label="Open notifications"
-            aria-controls={notificationAnchor ? "notification-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={notificationAnchor ? "true" : undefined}
-            sx={{ mr: 0.5 }}
-          >
-            <Badge badgeContent={notifications.length} color="error" max={9}>
-              <NotificationsNoneIcon />
-            </Badge>
-          </IconButton>
-        </Tooltip>
-
-        <Menu
-          id="notification-menu"
-          anchorEl={notificationAnchor}
-          open={Boolean(notificationAnchor)}
-          onClose={closeNotifications}
-          disableScrollLock
-          slotProps={{
-            paper: {
-              sx: {
-                width: {
-                  xs: 310,
-                  sm: 380,
-                },
-                maxWidth: "calc(100vw - 24px)",
-                mt: 1.5,
-                borderRadius: 3,
-                overflow: "hidden",
-              },
-            },
-          }}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          <Box
-            sx={{
-              px: 2.5,
-              py: 2,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <Typography variant="h6">Notifications</Typography>
-
-              <Typography variant="caption" color="text.secondary">
-                You have {notifications.length} new updates
-              </Typography>
-            </Box>
-
-            <Badge badgeContent={notifications.length} color="primary" />
-          </Box>
-
-          <Divider />
-
-          {notifications.map((notification) => (
-            <MenuItem
-              key={notification.id}
-              onClick={closeNotifications}
-              sx={{
-                alignItems: "flex-start",
-                gap: 1.5,
-                whiteSpace: "normal",
-                px: 2.5,
-                py: 1.75,
-              }}
-            >
-              <Avatar
-                sx={{
-                  width: 36,
-                  height: 36,
-                  bgcolor: `${notification.color}`,
-                }}
-              >
-                {notification.icon}
-              </Avatar>
-
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle2" fontWeight={700}>
-                  {notification.title}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    mt: 0.25,
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {notification.description}
-                </Typography>
-
-                <Typography
-                  variant="caption"
-                  color="text.disabled"
-                  sx={{
-                    display: "block",
-                    mt: 0.75,
-                  }}
-                >
-                  {notification.time}
-                </Typography>
-              </Box>
-            </MenuItem>
-          ))}
-
-          <Divider />
-
-          <MenuItem
-            onClick={() => {
-              closeNotifications();
-              navigate("/notifications");
-            }}
-            sx={{
-              justifyContent: "center",
-              py: 1.5,
-              color: "primary.main",
-              fontWeight: 700,
-            }}
-          >
-            View all notifications
-          </MenuItem>
-        </Menu>
 
         {/* Fullscreen */}
         <Tooltip title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}>
