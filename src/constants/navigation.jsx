@@ -8,6 +8,7 @@ import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
 import CollectionsOutlinedIcon from "@mui/icons-material/CollectionsOutlined";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import ContactMailOutlinedIcon from "@mui/icons-material/ContactMailOutlined";
 
 const navigation = [
   {
@@ -39,6 +40,11 @@ const navigation = [
     title: "Receipts",
     icon: ReceiptLongOutlinedIcon,
     path: "/receipts",
+  },
+  {
+    title: "Event Enquiries",
+    icon: ContactMailOutlinedIcon,
+    path: "/enquiries",
   },
   {
     title: "Patrol Scoreboard",

@@ -23,6 +23,7 @@ import Gallery from "./pages/gallery/Gallery";
 import Anniversaries from "./pages/anniversaries/Anniversaries";
 import LandingPage from "./pages/LandingPage";
 import Receipts from "./pages/receipts/Receipts";
+import Enquiries from "./pages/enquiries/Enquiries";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/profile" element={<AdminProfile />} />
         <Route path="/receipts" element={<Receipts />} />
+        <Route path="/enquiries" element={<Enquiries />} />
       </Route>
 
       <Route element={<ProtectedRoute role="member"><MemberLayout /></ProtectedRoute>}>

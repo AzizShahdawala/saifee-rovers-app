@@ -1,0 +1,27 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, Box, Button, Chip, Grid, IconButton, MenuItem, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { EmailOutlined, EventAvailableOutlined, MarkEmailReadOutlined, PhoneOutlined, RefreshOutlined } from "@mui/icons-material";
+import API from "../../api/axios";
+import { DataTable, PageHeader, StatCard } from "../../components/common";
+
+const date = (value) => value ? new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Not specified";
+const messageOf = (error) => error.response?.data?.message || error.message || "Unable to load enquiries";
+
+export default function Enquiries() {
+  const [inquiries, setInquiries] = useState([]); const [status, setStatus] = useState("all"); const [loading, setLoading] = useState(true); const [error, setError] = useState(""); const [notice, setNotice] = useState("");
+  const load = useCallback(async () => { setLoading(true); setError(""); try { const { data } = await API.get("/contact-inquiries", { params: { status } }); setInquiries(data.inquiries || []); } catch (requestError) { setError(messageOf(requestError)); } finally { setLoading(false); } }, [status]);
+  useEffect(() => { const id = setTimeout(load, 0); return () => clearTimeout(id); }, [load]);
+  const update = async (row, nextStatus) => { try { const { data } = await API.patch(`/contact-inquiries/${row._id}`, { status: nextStatus }); setNotice(data.message); await load(); } catch (requestError) { setError(messageOf(requestError)); } };
+  const resend = async (row) => { try { const { data } = await API.post(`/contact-inquiries/${row._id}/resend`); setNotice(data.message); await load(); } catch (requestError) { setError(messageOf(requestError)); } };
+  const counts = useMemo(() => ({ new: inquiries.filter((item) => item.status === "new").length, contacted: inquiries.filter((item) => item.status === "contacted").length, total: inquiries.length }), [inquiries]);
+  const columns = [
+    { id: "referenceNumber", label: "Reference", minWidth: 145, render: (row) => <Box><Typography fontWeight={900} color="primary.main">{row.referenceNumber}</Typography><Typography variant="caption" color="text.secondary">{date(row.createdAt)}</Typography></Box> },
+    { id: "name", label: "Contact", minWidth: 210, render: (row) => <Box><Typography fontWeight={850}>{row.name}</Typography><Typography variant="caption" color="text.secondary"><PhoneOutlined sx={{ fontSize: 12, mr: .5, verticalAlign: "middle" }} />{row.phone}{row.email ? ` · ${row.email}` : ""}</Typography></Box> },
+    { id: "eventTitle", label: "Event", minWidth: 230, render: (row) => <Box><Typography fontWeight={800}>{row.eventTitle}</Typography><Typography variant="caption" color="text.secondary">Event date: {date(row.eventDate)}</Typography></Box> },
+    { id: "eventDescription", label: "Description", minWidth: 300, render: (row) => <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", maxWidth: 440 }}>{row.eventDescription}</Typography> },
+    { id: "adminEmailStatus", label: "Admin email", minWidth: 120, render: (row) => <Chip size="small" label={row.adminEmailStatus} color={row.adminEmailStatus === "sent" ? "success" : row.adminEmailStatus === "failed" ? "error" : "warning"} /> },
+    { id: "status", label: "Status", minWidth: 145, render: (row) => <TextField select size="small" value={row.status} onChange={(event) => update(row, event.target.value)} sx={{ minWidth: 130 }}><MenuItem value="new">New</MenuItem><MenuItem value="contacted">Contacted</MenuItem><MenuItem value="closed">Closed</MenuItem></TextField> },
+    { id: "actions", label: "", minWidth: 60, render: (row) => <Tooltip title="Email admin group again"><IconButton onClick={() => resend(row)}><EmailOutlined /></IconButton></Tooltip> },
+  ];
+  return <Box><PageHeader title="Event Enquiries" subtitle="Invitation requests submitted from the public Saifee Rovers website." />{error && <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>{error}</Alert>}{notice && <Alert severity="success" onClose={() => setNotice("")} sx={{ mb: 2 }}>{notice}</Alert>}<Grid container spacing={2} sx={{ mb: 3 }}><Grid size={{ xs: 12, sm: 4 }}><StatCard title="Total enquiries" value={counts.total} icon={<EventAvailableOutlined />} color="primary" loading={loading} /></Grid><Grid size={{ xs: 12, sm: 4 }}><StatCard title="New" value={counts.new} icon={<EmailOutlined />} color="warning" loading={loading} /></Grid><Grid size={{ xs: 12, sm: 4 }}><StatCard title="Contacted" value={counts.contacted} icon={<MarkEmailReadOutlined />} color="success" loading={loading} /></Grid></Grid><Paper sx={{ p: 2, mb: 2, border: "1px solid", borderColor: "divider" }}><Stack direction="row" spacing={2}><TextField select size="small" label="Status" value={status} onChange={(event) => setStatus(event.target.value)} sx={{ minWidth: 180 }}><MenuItem value="all">All enquiries</MenuItem><MenuItem value="new">New</MenuItem><MenuItem value="contacted">Contacted</MenuItem><MenuItem value="closed">Closed</MenuItem></TextField><Button startIcon={<RefreshOutlined />} onClick={load}>Refresh</Button></Stack></Paper><DataTable columns={columns} rows={inquiries} loading={loading} getRowId={(row) => row._id} defaultOrderBy="createdAt" defaultOrder="desc" emptyTitle="No event enquiries" emptyDescription="New invitation requests from the public website will appear here." /></Box>;
+}

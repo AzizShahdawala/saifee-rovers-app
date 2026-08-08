@@ -1,11 +1,14 @@
 import { Box, Button, Chip, Container, Grid, Stack, Typography } from "@mui/material";
-import { ArrowForward, CampaignOutlined, Diversity3Outlined, FlagOutlined, MusicNoteOutlined, VolunteerActivismOutlined } from "@mui/icons-material";
+import { ArrowForward, CampaignOutlined, Diversity3Outlined, EventAvailableOutlined, FlagOutlined, MusicNoteOutlined, VolunteerActivismOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 import logo from "../assets/logo.png";
 import scoutsImage from "../assets/landing-scouts.jpg";
 import serviceImage from "../assets/landing-service.jpg";
 import communityImage from "../assets/landing-community.jpg";
+import ContactDialog from "../components/landing/ContactDialog";
+import ScoutCarousel from "../components/landing/ScoutCarousel";
 
 const values = [
   { icon: <VolunteerActivismOutlined />, title: "Khidmat in action", text: "Voluntary service through crowd support, venue management and food distribution during community gatherings." },
@@ -15,11 +18,12 @@ const values = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [contactOpen, setContactOpen] = useState(false);
   return <Box sx={{ minHeight: "100vh", bgcolor: "#f8f5fb", color: "#29133d", overflow: "hidden" }}>
     <Box component="header" sx={{ position: "absolute", inset: "0 0 auto", width: "100%", zIndex: 3, py: { xs: 1.5, sm: 2.2 } }}>
       <Container maxWidth="xl" sx={{ width: "100%" }}><Stack direction="row" alignItems="center" sx={{ width: "100%" }}>
         <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 1.5 }} sx={{ minWidth: 0 }}><Box component="img" src={logo} alt="Saifee Rovers emblem" sx={{ width: { xs: 44, sm: 54 }, height: { xs: 44, sm: 54 }, flexShrink: 0, objectFit: "contain", bgcolor: "white", borderRadius: "50%", p: .4 }} /><Box sx={{ minWidth: 0 }}><Typography sx={{ color: "white", fontWeight: 900, letterSpacing: ".04em", lineHeight: 1.1, fontSize: { xs: 14, sm: 16 }, whiteSpace: "nowrap" }}>SAIFEE ROVERS</Typography><Typography sx={{ display: { xs: "none", sm: "block" }, color: "rgba(255,255,255,.72)", fontSize: 12 }}>20th East Bombay · Since 1947</Typography></Box></Stack>
-        <Button variant="contained" onClick={() => navigate("/login")} endIcon={<ArrowForward />} sx={{ ml: "auto", flexShrink: 0, minWidth: { xs: 92, sm: 118 }, height: { xs: 42, sm: 48 }, borderRadius: 999, bgcolor: "white", color: "#622599", fontWeight: 900, px: { xs: 1.75, sm: 2.75 }, boxShadow: "0 10px 30px rgba(24,8,39,.22)", "&:hover": { bgcolor: "#f2e9f8" } }}>Login</Button>
+        <Stack direction="row" spacing={{ xs: .75, sm: 1.25 }} sx={{ ml: "auto", flexShrink: 0 }}><Button variant="outlined" onClick={() => setContactOpen(true)} startIcon={<EventAvailableOutlined />} sx={{ minWidth: { xs: 44, sm: 122 }, height: { xs: 42, sm: 48 }, px: { xs: 1.25, sm: 2.25 }, borderRadius: 999, borderColor: "rgba(255,255,255,.7)", color: "white", fontWeight: 900, "& .MuiButton-startIcon": { mr: { xs: 0, sm: 1 } }, "&:hover": { borderColor: "white", bgcolor: "rgba(255,255,255,.12)" } }}><Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>Contact Us</Box></Button><Button variant="contained" onClick={() => navigate("/login")} endIcon={<ArrowForward />} sx={{ flexShrink: 0, minWidth: { xs: 88, sm: 118 }, height: { xs: 42, sm: 48 }, borderRadius: 999, bgcolor: "white", color: "#622599", fontWeight: 900, px: { xs: 1.5, sm: 2.75 }, boxShadow: "0 10px 30px rgba(24,8,39,.22)", "&:hover": { bgcolor: "#f2e9f8" } }}>Login</Button></Stack>
       </Stack></Container>
     </Box>
 
@@ -33,6 +37,8 @@ export default function LandingPage() {
       <Typography sx={{ display: { xs: "none", md: "block" }, position: "absolute", right: 22, bottom: 28, color: "rgba(255,255,255,.65)", fontSize: 11, writingMode: "vertical-rl", letterSpacing: ".15em" }}>BE PREPARED</Typography>
     </Box>
 
+    <ScoutCarousel />
+
     <Box id="story" component="section" sx={{ py: { xs: 9, md: 14 } }}><Container maxWidth="lg"><Grid container spacing={{ xs: 5, md: 9 }} alignItems="center">
       <Grid size={{ xs: 12, md: 6 }}><Typography variant="overline" sx={{ color: "#622599", fontWeight: 900, letterSpacing: ".18em" }}>Our heritage</Typography><Typography variant="h2" sx={{ mt: 1, fontWeight: 950, letterSpacing: "-.04em", fontSize: { xs: "2.35rem", sm: "2.8rem", md: "4rem" } }}>A legacy built on service.</Typography><Typography sx={{ mt: 3, color: "#675a70", fontSize: { xs: 16, sm: 18 }, lineHeight: 1.8 }}>Saifee Rovers is the senior scouting division of the Saifee Scout Group, 20th East Bombay. Established in 1947, the group serves within Mumbai’s Dawoodi Bohra community and is associated with the Bharat Scouts and Guides.</Typography><Typography sx={{ mt: 2, color: "#675a70", fontSize: { xs: 16, sm: 18 }, lineHeight: 1.8 }}>Its guiding spirit brings together the scout promise of <strong>“Be Prepared”</strong> and the enduring call of <strong>“Service & Sacrifice”</strong>—values carried into every gathering, project and performance.</Typography></Grid>
       <Grid size={{ xs: 12, md: 6 }}><Box sx={{ position: "relative", pl: { md: 5 }, pb: 5 }}><Box component="img" src={serviceImage} alt="Volunteers serving the community" sx={{ width: "100%", height: { xs: 380, sm: 480, md: 520 }, objectFit: "cover", borderRadius: { xs: "100px 100px 20px 20px", md: "180px 180px 24px 24px" }, boxShadow: "0 30px 70px rgba(65,22,96,.18)" }} /><Box sx={{ position: "absolute", left: 0, bottom: 0, bgcolor: "#622599", color: "white", p: { xs: 2.5, sm: 3 }, maxWidth: 230, borderRadius: 2 }}><Typography variant="h4" fontWeight={950}>Khidmat</Typography><Typography sx={{ mt: .5, lineHeight: 1.5 }}>Service offered with humility, discipline and heart.</Typography></Box></Box></Grid>
@@ -45,5 +51,6 @@ export default function LandingPage() {
     <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: "#e9daf3" }}><Container maxWidth="md"><Stack alignItems="center" textAlign="center"><Typography variant="h2" sx={{ fontWeight: 950, letterSpacing: "-.04em", fontSize: { xs: "2.25rem", sm: "2.8rem", md: "4rem" } }}>Part of the Rovers family?</Typography><Typography sx={{ mt: 2, fontSize: { xs: 16, sm: 19 }, color: "#675a70" }}>Sign in to access attendance, events, galleries and member services.</Typography><Button variant="contained" size="large" onClick={() => navigate("/login")} endIcon={<ArrowForward />} sx={{ mt: 4, width: { xs: "100%", sm: "auto" }, bgcolor: "#622599", borderRadius: 999, px: 4, py: 1.5, fontWeight: 900, "&:hover": { bgcolor: "#4b1977" } }}>Go to member login</Button></Stack></Container></Box>
 
     <Box component="footer" sx={{ py: 4, bgcolor: "#28103b", color: "rgba(255,255,255,.7)" }}><Container maxWidth="lg"><Stack spacing={1.5} alignItems="center" justifyContent="center" textAlign="center"><Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}><Box component="img" src={logo} alt="" sx={{ width: 42, height: 42 }} /><Typography fontWeight={900} color="white">Saifee Rovers</Typography></Stack><Typography variant="body2">Service & Sacrifice · Be Prepared · Mumbai</Typography></Stack></Container></Box>
+    <ContactDialog open={contactOpen} onClose={() => setContactOpen(false)} />
   </Box>;
 }
