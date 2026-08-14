@@ -14,12 +14,12 @@ export default function PatrolChart({ data = [], onPatrolClick }) {
 
   return (
     <Stack direction={{ xs: "column", sm: "row" }} spacing={3} alignItems="center" justifyContent="center">
-      <Box sx={{ width: 160, height: 160, borderRadius: "50%", background: `conic-gradient(${gradient})`, display: "grid", placeItems: "center" }}>
+      <Box sx={{ width: { xs: 144, sm: 160 }, height: { xs: 144, sm: 160 }, flexShrink: 0, borderRadius: "50%", background: `conic-gradient(${gradient})`, display: "grid", placeItems: "center" }}>
         <Box sx={{ width: 100, height: 100, borderRadius: "50%", bgcolor: "background.paper", display: "grid", placeItems: "center" }}>
           <Box textAlign="center"><Typography variant="h5" fontWeight={800}>{total === 1 && !data.length ? 0 : total}</Typography><Typography variant="caption" color="text.secondary">Members</Typography></Box>
         </Box>
       </Box>
-      <Stack spacing={1} sx={{ minWidth: 150 }}>
+      <Stack spacing={1} sx={{ width: { xs: "100%", sm: "auto" }, minWidth: { sm: 150 }, maxWidth: 320 }}>
         {items.map((item, index) => <ButtonBase key={item.label || index} disabled={!data.length || !onPatrolClick} onClick={() => onPatrolClick?.(item.label)} sx={{ width: "100%", borderRadius: 1.5, px: 1, py: .75, justifyContent: "flex-start", "&:hover": { bgcolor: "action.hover" } }}><Stack direction="row" alignItems="center" spacing={1} sx={{ width: "100%" }}><Box sx={{ width: 10, height: 10, borderRadius: "50%", bgcolor: colors[index % colors.length] }} /><Typography variant="body2" sx={{ flexGrow: 1, textAlign: "left", fontWeight: onPatrolClick ? 700 : 400 }}>{item.label}</Typography><Typography variant="body2" fontWeight={700}>{data.length ? item.value : 0}</Typography></Stack></ButtonBase>)}
       </Stack>
     </Stack>

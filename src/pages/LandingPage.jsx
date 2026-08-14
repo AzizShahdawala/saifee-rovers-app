@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Container, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Chip, Container, Grid, Link, Stack, Typography } from "@mui/material";
 import { ArrowForward, CampaignOutlined, Diversity3Outlined, EventAvailableOutlined, FlagOutlined, MusicNoteOutlined, VolunteerActivismOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -50,7 +50,7 @@ export default function LandingPage() {
 
     <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: "#e9daf3" }}><Container maxWidth="md"><Stack alignItems="center" textAlign="center"><Typography variant="h2" sx={{ fontWeight: 950, letterSpacing: "-.04em", fontSize: { xs: "2.25rem", sm: "2.8rem", md: "4rem" } }}>Part of the Rovers family?</Typography><Typography sx={{ mt: 2, fontSize: { xs: 16, sm: 19 }, color: "#675a70" }}>Sign in to access attendance, events, galleries and member services.</Typography><Button variant="contained" size="large" onClick={() => navigate("/login")} endIcon={<ArrowForward />} sx={{ mt: 4, width: { xs: "100%", sm: "auto" }, bgcolor: "#622599", borderRadius: 999, px: 4, py: 1.5, fontWeight: 900, "&:hover": { bgcolor: "#4b1977" } }}>Go to member login</Button></Stack></Container></Box>
 
-    <Box component="footer" sx={{ py: 4, bgcolor: "#28103b", color: "rgba(255,255,255,.7)" }}><Container maxWidth="lg"><Stack spacing={1.5} alignItems="center" justifyContent="center" textAlign="center"><Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}><Box component="img" src={logo} alt="" sx={{ width: 42, height: 42 }} /><Typography fontWeight={900} color="white">Saifee Rovers</Typography></Stack><Typography variant="body2">Service & Sacrifice · Be Prepared · Mumbai</Typography></Stack></Container></Box>
+    <Box component="footer" sx={{ py: 4, px: 2, bgcolor: "#28103b", color: "rgba(255,255,255,.7)" }}><Container maxWidth="lg"><Stack spacing={1.5} alignItems="center" justifyContent="center" textAlign="center"><Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}><Box component="img" src={logo} alt="" sx={{ width: 42, height: 42 }} /><Typography fontWeight={900} color="white">Saifee Rovers</Typography></Stack><Typography variant="body2">Service & Sacrifice · Be Prepared · Mumbai</Typography><Link href="https://www.azizshahda.com" target="_blank" rel="noopener noreferrer" color="inherit" underline="hover" sx={{ fontSize: { xs: ".8rem", sm: ".875rem" }, fontWeight: 700, overflowWrap: "anywhere" }}>Website by Aziz Shahdawala · www.azizshahda.com</Link></Stack></Container></Box>
     <ContactDialog open={contactOpen} onClose={() => setContactOpen(false)} />
   </Box>;
 }
