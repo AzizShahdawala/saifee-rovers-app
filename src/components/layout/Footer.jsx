@@ -10,7 +10,7 @@ export default function Footer() {
             © {new Date().getFullYear()}
           </Typography>
           <Link href="https://www.azizshahda.com" target="_blank" rel="noopener noreferrer" variant="body2" color="primary.main" fontWeight={700} underline="hover">
-            Aziz Shahdawala · www.azizshahda.com
+            Aziz Shahdawala
           </Link>
         </Stack>
       </Box>
