@@ -30,6 +30,7 @@ import {
   ChatBubbleOutlineOutlined as ChatBubbleOutline,
   CloseOutlined,
   DeleteOutlineOutlined as DeleteOutline,
+  EditOutlined,
   Inventory2Outlined,
   LocalOfferOutlined,
   PlayCircleOutlineOutlined as PlayCircleOutline,
@@ -41,9 +42,11 @@ import { getStoredUser } from "../../utils/auth";
 import {
   addMarketplaceComment,
   createMarketplaceListing,
+  deleteMarketplaceListing,
   getMarketplaceListings,
   removeMarketplaceComment,
   updateMarketplaceStatus,
+  updateMarketplaceListing,
 } from "../../services/marketplaceService";
 
 const messageOf = (error, fallback) =>
@@ -204,6 +207,7 @@ export default function Marketplace() {
     [members, setMembers] = useState([]),
     [selected, setSelected] = useState(null);
   const [createOpen, setCreateOpen] = useState(false),
+    [editingId, setEditingId] = useState(null),
     [loading, setLoading] = useState(true),
     [saving, setSaving] = useState(false),
     [error, setError] = useState(""),
@@ -258,12 +262,35 @@ export default function Marketplace() {
       items.map((item) => (item._id === listing._id ? listing : item)),
     );
   };
+  const openCreate = () => {
+    setEditingId(null);
+    setForm({
+      title: "",
+      description: "",
+      listingType: "sale",
+      price: "",
+      media: [],
+    });
+    setCreateOpen(true);
+  };
+  const openEdit = () => {
+    setEditingId(selected._id);
+    setForm({
+      title: selected.title,
+      description: selected.description,
+      listingType: selected.listingType,
+      price: selected.price || "",
+      media: [],
+    });
+    setSelected(null);
+    setCreateOpen(true);
+  };
   const submitListing = async (event) => {
     event.preventDefault();
     setError("");
     if (
-      form.media.reduce((total, file) => total + file.size, 0) >
-      4 * 1024 * 1024
+      !editingId &&
+      form.media.reduce((total, file) => total + file.size, 0) > 4 * 1024 * 1024
     ) {
       setError(
         "Photos and videos must be 4 MB or less in total. Please compress larger videos.",
@@ -272,13 +299,27 @@ export default function Marketplace() {
     }
     setSaving(true);
     try {
-      const body = new FormData();
-      body.append("title", form.title);
-      body.append("description", form.description);
-      body.append("listingType", form.listingType);
-      body.append("price", form.price || "0");
-      form.media.forEach((file) => body.append("media", file));
-      await createMarketplaceListing(body);
+      if (editingId) {
+        const { data } = await updateMarketplaceListing(editingId, {
+          title: form.title,
+          description: form.description,
+          listingType: form.listingType,
+          price: form.price || 0,
+        });
+        setListings((items) =>
+          items.map((item) =>
+            item._id === data.listing._id ? data.listing : item,
+          ),
+        );
+      } else {
+        const body = new FormData();
+        body.append("title", form.title);
+        body.append("description", form.description);
+        body.append("listingType", form.listingType);
+        body.append("price", form.price || "0");
+        form.media.forEach((file) => body.append("media", file));
+        await createMarketplaceListing(body);
+      }
       setForm({
         title: "",
         description: "",
@@ -287,8 +328,11 @@ export default function Marketplace() {
         media: [],
       });
       setCreateOpen(false);
-      setScope("mine");
-      await load();
+      setEditingId(null);
+      if (!editingId) {
+        setScope("mine");
+        await load();
+      }
     } catch (e) {
       setError(messageOf(e, "Could not publish listing"));
     } finally {
@@ -331,6 +375,20 @@ export default function Marketplace() {
       setError(messageOf(e, "Could not remove comment"));
     }
   };
+  const deleteListing = async () => {
+    if (!window.confirm(`Delete “${selected.title}”? This cannot be undone.`))
+      return;
+    setSaving(true);
+    try {
+      await deleteMarketplaceListing(selected._id);
+      setListings((items) => items.filter((item) => item._id !== selected._id));
+      setSelected(null);
+    } catch (e) {
+      setError(messageOf(e, "Could not delete listing"));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Box>
@@ -342,7 +400,7 @@ export default function Marketplace() {
             <Button
               variant="contained"
               startIcon={<AddOutlined />}
-              onClick={() => setCreateOpen(true)}
+              onClick={openCreate}
             >
               Post an item
             </Button>
@@ -395,7 +453,7 @@ export default function Marketplace() {
               <Button
                 variant="contained"
                 startIcon={<AddOutlined />}
-                onClick={() => setCreateOpen(true)}
+                onClick={openCreate}
                 sx={{ mt: 1 }}
               >
                 Post an item
@@ -436,7 +494,7 @@ export default function Marketplace() {
         component="form"
         onSubmit={submitListing}
       >
-        <DialogTitle>Post an item</DialogTitle>
+        <DialogTitle>{editingId ? "Edit item" : "Post an item"}</DialogTitle>
         <DialogContent>
           <Stack spacing={2.25} sx={{ pt: 1 }}>
             <TextField
@@ -462,6 +520,12 @@ export default function Marketplace() {
               <Select
                 label="Offer type"
                 value={form.listingType}
+                disabled={
+                  editingId &&
+                  ["sold", "donated"].includes(
+                    listings.find((item) => item._id === editingId)?.status,
+                  )
+                }
                 onChange={(e) =>
                   setForm({ ...form, listingType: e.target.value })
                 }
@@ -482,36 +546,53 @@ export default function Marketplace() {
                 type="number"
                 label="Asking price (₹)"
                 value={form.price}
+                disabled={
+                  editingId &&
+                  ["sold", "donated"].includes(
+                    listings.find((item) => item._id === editingId)?.status,
+                  )
+                }
                 inputProps={{ min: 0 }}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
             )}
-            <Button component="label" variant="outlined">
-              Choose photos or videos
-              <input
-                hidden
-                multiple
-                required
-                type="file"
-                accept="image/*,video/*"
-                onChange={(e) =>
-                  setForm({ ...form, media: [...e.target.files] })
-                }
-              />
-            </Button>
+            {!editingId && (
+              <Button component="label" variant="outlined">
+                Choose photos or videos
+                <input
+                  hidden
+                  multiple
+                  required
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={(e) =>
+                    setForm({ ...form, media: [...e.target.files] })
+                  }
+                />
+              </Button>
+            )}
             <Typography variant="caption" color="text.secondary">
-              {form.media.length
-                ? `${form.media.length} file(s) selected · ${(form.media.reduce((total, file) => total + file.size, 0) / 1024 / 1024).toFixed(1)} MB total`
-                : "Add 1–8 compressed photos or short videos, up to 4 MB combined."}
+              {editingId
+                ? "Existing photos and videos will be retained."
+                : form.media.length
+                  ? `${form.media.length} file(s) selected · ${(form.media.reduce((total, file) => total + file.size, 0) / 1024 / 1024).toFixed(1)} MB total`
+                  : "Add 1–8 compressed photos or short videos, up to 4 MB combined."}
             </Typography>
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setCreateOpen(false);
+              setEditingId(null);
+            }}
+          >
+            Cancel
+          </Button>
           <Button
             type="submit"
             variant="contained"
-            disabled={saving || !form.media.length}
+            disabled={saving || (!editingId && !form.media.length)}
           >
             {saving ? "Publishing…" : "Publish"}
           </Button>
@@ -619,9 +700,45 @@ export default function Marketplace() {
               )}
               {selectedIsMine && (
                 <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Typography fontWeight={800} sx={{ mb: 1.5 }}>
-                    Manage this listing
-                  </Typography>
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    justifyContent="space-between"
+                    alignItems={{ sm: "center" }}
+                    spacing={1}
+                    sx={{ mb: 1.5 }}
+                  >
+                    <Box>
+                      <Typography fontWeight={800}>
+                        Manage this listing
+                      </Typography>
+                      {["sold", "donated"].includes(selected.status) && (
+                        <Typography variant="caption" color="text.secondary">
+                          Completed listings stay in your transaction history.
+                        </Typography>
+                      )}
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<EditOutlined />}
+                        onClick={openEdit}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        color="error"
+                        variant="outlined"
+                        startIcon={<DeleteOutline />}
+                        onClick={deleteListing}
+                        disabled={
+                          saving ||
+                          ["sold", "donated"].includes(selected.status)
+                        }
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
+                  </Stack>
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                     <FormControl fullWidth>
                       <InputLabel>Status</InputLabel>
