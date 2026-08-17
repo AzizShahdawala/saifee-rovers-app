@@ -30,6 +30,7 @@ import Loader from "../common/Loader";
 
 import useMemberForm from "../../hooks/useMemberForm";
 import { INSTRUMENTS, PATROLS, PROFESSIONS, PROFESSION_DETAIL_LABELS, professionLabel } from "../../constants/memberOptions";
+import { isValidHijriDate } from "../../utils/memberDates";
 
 import {
   validateName,
@@ -153,6 +154,10 @@ export default function MemberForm() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth label="Hijri Date of Birth" placeholder="1442-09-15" inputProps={{ inputMode: "numeric", maxLength: 10 }} {...register("hijriDateOfBirth", { required: "Hijri date of birth is required", validate: (value) => isValidHijriDate(value) || "Use YYYY-MM-DD in the Umm al-Qura calendar" })} error={!!errors.hijriDateOfBirth} helperText={errors.hijriDateOfBirth?.message || "Umm al-Qura calendar format: YYYY-MM-DD"} />
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField fullWidth type="number" label="Joined Saifee Rovers in year" defaultValue={2020} slotProps={{ htmlInput: { min: 1947, max: new Date().getFullYear(), step: 1 } }} {...register("joinedYear", { valueAsNumber: true, required: "Joined year is required", min: { value: 1947, message: "Joined year cannot be earlier than 1947" }, max: { value: new Date().getFullYear(), message: "Joined year cannot be in the future" } })} error={!!errors.joinedYear} helperText={errors.joinedYear?.message || "Temporary default is 2020; update it when the actual year is known."} />
               </Grid>
 
@@ -227,6 +232,8 @@ export default function MemberForm() {
                     </Typography>
 
                     <Typography><strong>Date of Birth:</strong> {formValues.dateOfBirth || "-"}</Typography>
+
+                    <Typography><strong>Hijri Date of Birth:</strong> {formValues.hijriDateOfBirth || "-"}</Typography>
 
                     <Typography><strong>Joined Saifee Rovers:</strong> {formValues.joinedYear || 2020}</Typography>
 

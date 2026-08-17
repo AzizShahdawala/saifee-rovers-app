@@ -4,6 +4,7 @@ import { CameraAltOutlined, LockResetOutlined, VisibilityOffOutlined, Visibility
 import { changeMemberPassword, getMemberProfile, updateMemberProfilePhoto } from "../../services/memberPortalService";
 import { professionLabel } from "../../constants/memberOptions";
 import { getStoredUser } from "../../utils/auth";
+import { formatPatrolPeriod } from "../../utils/memberDates";
 
 const errorMessage = (error, fallback) => error.response?.data?.message || error.message || fallback;
 
@@ -57,7 +58,7 @@ export default function MemberProfile() {
 
   if (!member && !error) return <Box sx={{ minHeight: 300, display: "grid", placeItems: "center" }}><CircularProgress /></Box>;
   if (!member) return <Alert severity="error">{error}</Alert>;
-  const fields = [["ITS ID", member.itsId], ["Full name", member.name], ["Email", member.email], ["Phone", member.phone], ["Date of birth", new Date(member.dateOfBirth).toLocaleDateString("en-IN", { dateStyle: "long" })], ["Joined Saifee Rovers", member.joinedYear || 2020], ["Profession", professionLabel(member.profession)], ["Profession details", member.professionDetails || "Not applicable"], ["Marital status", member.maritalStatus === "MARRIED" ? "Married" : "Unmarried"], ["Spouse", member.spouseName || "Not applicable"], ["Spouse date of birth", member.spouseDateOfBirth ? new Date(member.spouseDateOfBirth).toLocaleDateString("en-IN", { dateStyle: "long" }) : "Not applicable"], ["Children", member.children?.length ? member.children.map((child) => `${child.name} (${new Date(child.dateOfBirth).toLocaleDateString("en-IN")})`).join(", ") : "None"], ["Patrol", member.patrol], ["Instrument", member.instrument || "Not assigned"], ["Member status", member.status], ["Registered in app", new Date(member.createdAt).toLocaleDateString("en-IN", { dateStyle: "long" })]];
+  const fields = [["ITS ID", member.itsId], ["Full name", member.name], ["Email", member.email], ["Phone", member.phone], ["Date of birth", new Date(member.dateOfBirth).toLocaleDateString("en-IN", { dateStyle: "long" })], ["Hijri date of birth", member.hijriDateOfBirth || "Not available"], ["Joined Saifee Rovers", member.joinedYear || 2020], ["Profession", professionLabel(member.profession)], ["Profession details", member.professionDetails || "Not applicable"], ["Marital status", member.maritalStatus === "MARRIED" ? "Married" : "Unmarried"], ["Spouse", member.spouseName || "Not applicable"], ["Spouse date of birth", member.spouseDateOfBirth ? new Date(member.spouseDateOfBirth).toLocaleDateString("en-IN", { dateStyle: "long" }) : "Not applicable"], ["Children", member.children?.length ? member.children.map((child) => `${child.name} (${new Date(child.dateOfBirth).toLocaleDateString("en-IN")})`).join(", ") : "None"], ["Patrol", member.patrol], ["Instrument", member.instrument || "Not assigned"], ["Member status", member.status], ["Registered in app", new Date(member.createdAt).toLocaleDateString("en-IN", { dateStyle: "long" })]];
 
   return <Stack spacing={3}>
     <Box><Typography variant="h4" fontWeight={900}>My profile</Typography><Typography color="text.secondary">Manage your profile picture, account security, and membership information.</Typography></Box>
@@ -69,6 +70,7 @@ export default function MemberProfile() {
         <Box sx={{ flex: 1, textAlign: { xs: "center", sm: "left" } }}><Typography variant="h5" fontWeight={900}>{member.name}</Typography><Typography color="text.secondary">{member.patrol} patrol</Typography><Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} sx={{ mt: 2 }}><Button component="label" variant="outlined" startIcon={<CameraAltOutlined />} disabled={photoLoading}>Change picture<input hidden type="file" accept="image/png,image/jpeg" onChange={selectPhoto} /></Button><Button variant="outlined" startIcon={<LockResetOutlined />} onClick={() => { setError(""); setPasswordOpen(true); }}>Change password</Button></Stack><Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>JPG or PNG, maximum 5 MB.</Typography></Box>
       </Stack>
       <Divider sx={{ my: 3 }} /><GridFields fields={fields} />
+      <Divider sx={{ my: 3 }} /><Typography variant="h6" fontWeight={900} sx={{ mb: 2 }}>Patrol history</Typography><Stack spacing={1.25}>{member.patrolHistory?.length ? member.patrolHistory.map((entry) => <Box key={entry._id || `${entry.patrol}-${entry.fromDate}`} sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", gap: .5, p: 1.5, bgcolor: "action.hover", borderRadius: 2 }}><Typography fontWeight={800}>{entry.patrol}</Typography><Typography color="text.secondary">{formatPatrolPeriod(entry)}</Typography></Box>) : <Typography color="text.secondary">No patrol history is available.</Typography>}</Stack>
     </Paper>
 
     <Dialog open={passwordOpen} onClose={() => !passwordLoading && setPasswordOpen(false)} fullWidth maxWidth="xs">

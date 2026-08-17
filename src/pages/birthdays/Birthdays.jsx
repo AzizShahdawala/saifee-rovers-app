@@ -75,6 +75,7 @@ export default function Birthdays() {
     { id: "type", label: "Category", sortable: true, minWidth: 125, render: (row) => <Chip size="small" icon={typeMeta[row.type].icon} label={typeMeta[row.type].label} color={typeMeta[row.type].color} variant="outlined" /> },
     { id: "memberName", label: "Member / Family", sortable: true, minWidth: 190, render: (row) => row.type === "MEMBER" ? "Self" : row.memberName },
     { id: "patrol", label: "Patrol", sortable: true, minWidth: 125, render: (row) => row.patrol || "-" },
+    { id: "hijriDateOfBirth", label: "Hijri DOB", minWidth: 130, render: (row) => row.hijriDateOfBirth || "-" },
     { id: "turningAge", label: "Turning", sortable: true, minWidth: 100, render: (row) => `${row.turningAge} years` },
   ];
 
