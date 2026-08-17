@@ -8,7 +8,7 @@ const pad = (value) => String(value).padStart(2, "0");
 const currentHijri = gregorianToHijriParts(new Date());
 const years = Array.from({ length: 401 }, (_, index) => 1600 - index);
 
-export default function HijriDatePicker({ label = "Hijri Date of Birth", value = "", onChange, disabled = false, error = false, helperText = "Select a date from the Umm al-Qura calendar", required = false }) {
+export default function HijriDatePicker({ label = "Hijri Date of Birth", value = "", onChange, disabled = false, error = false, helperText = "Select a date from the Dawoodi Bohra Misri calendar", required = false }) {
   const parsed = isValidHijriDate(value) ? value.split("-").map(Number) : [currentHijri.year, currentHijri.month, currentHijri.day];
   const [open, setOpen] = useState(false);
   const [year, setYear] = useState(parsed[0]);

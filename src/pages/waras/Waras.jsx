@@ -44,7 +44,7 @@ export default function Waras() {
     { id: "turningAge", label: "Waras", sortable: true, minWidth: 100, render: (row) => `${row.turningAge}` },
   ];
   return <Box>
-    <PageHeader title="Waras" subtitle="Track members and their families by their Umm al-Qura birth dates." />
+    <PageHeader title="Waras" subtitle="Track members and their families by the Dawoodi Bohra Misri calendar." />
     {error ? <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>{error}</Alert> : null}
     <Paper sx={{ p: { xs: 2.5, md: 4 }, mb: 3, color: "white", overflow: "hidden", position: "relative", background: "linear-gradient(125deg, #172554 0%, #5B21B6 52%, #0F766E 100%)" }}><NightsStayOutlined sx={{ position: "absolute", right: { xs: -20, md: 35 }, top: -25, fontSize: 190, opacity: .14 }} /><Typography variant="overline" fontWeight={900}>Islamic calendar</Typography><Typography variant="h3" fontWeight={950} sx={{ maxWidth: 700, fontSize: { xs: "2rem", md: "3rem" } }}>Waras Mubarak.</Typography><Typography sx={{ mt: 1, opacity: .9 }}>Today is {hijriLabel(data.currentHijriDate)}. Plan ahead for every member and family Waras.</Typography></Paper>
     <Grid container spacing={2} sx={{ mb: 3 }}>{cards.map(([label, value, color, icon]) => <Grid size={{ xs: 6, md: 3 }} key={label}><Paper sx={{ p: 2.25, border: "1px solid", borderColor: "divider", height: "100%" }}><Stack direction="row" spacing={1.5} alignItems="center"><Avatar sx={{ bgcolor: color }}>{icon}</Avatar><Box><Typography variant="h4" fontWeight={950}>{value}</Typography><Typography color="text.secondary" fontWeight={700}>{label}</Typography></Box></Stack></Paper></Grid>)}</Grid>

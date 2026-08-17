@@ -23,6 +23,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 
 import { getNavigationTitle } from "../../constants/navigation";
+import NotificationBell from "../common/NotificationBell";
 
 export default function TopBar({ setMobileOpen, onMenuClick }) {
   const location = useLocation();
@@ -189,6 +190,8 @@ export default function TopBar({ setMobileOpen, onMenuClick }) {
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Fullscreen */}
+        <NotificationBell />
+
         <Tooltip title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}>
           <IconButton
             onClick={toggleFullscreen}

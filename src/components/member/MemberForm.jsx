@@ -155,8 +155,8 @@ export default function MemberForm() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <input type="hidden" {...register("hijriDateOfBirth", { required: "Hijri date of birth is required", validate: (value) => isValidHijriDate(value) || "Select a valid Umm al-Qura date" })} />
-                <HijriDatePicker value={formValues.hijriDateOfBirth || ""} onChange={(value) => setValue("hijriDateOfBirth", value, { shouldValidate: true, shouldDirty: true })} required error={!!errors.hijriDateOfBirth} helperText={errors.hijriDateOfBirth?.message || "Select the member's Islamic-calendar birth date"} />
+                <input type="hidden" {...register("hijriDateOfBirth", { required: "Hijri date of birth is required", validate: (value) => isValidHijriDate(value) || "Select a valid Dawoodi Bohra date" })} />
+                <HijriDatePicker value={formValues.hijriDateOfBirth || ""} onChange={(value) => setValue("hijriDateOfBirth", value, { shouldValidate: true, shouldDirty: true })} required error={!!errors.hijriDateOfBirth} helperText={errors.hijriDateOfBirth?.message || "Select the member's Dawoodi Bohra calendar birth date"} />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
