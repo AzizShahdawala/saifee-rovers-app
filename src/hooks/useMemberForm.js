@@ -28,6 +28,8 @@ export default function useMemberForm() {
 
       formData.append("dateOfBirth", data.dateOfBirth);
 
+      formData.append("joinedYear", String(data.joinedYear || 2020));
+
       formData.append("profession", data.profession);
 
       if (data.professionDetails) formData.append("professionDetails", data.professionDetails);

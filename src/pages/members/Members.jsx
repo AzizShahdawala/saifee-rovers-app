@@ -106,7 +106,7 @@ const Members = () => {
     const query = searchText.trim().toLowerCase();
 
     return members.filter((member) => {
-      const matchesQuery = !query || [member.itsId, member.name, member.email, member.phone, member.patrol, member.instrument, member.profession, member.professionDetails].some(
+      const matchesQuery = !query || [member.itsId, member.name, member.email, member.phone, member.joinedYear, member.patrol, member.instrument, member.profession, member.professionDetails].some(
         (value) =>
           String(value || "")
             .toLowerCase()
@@ -125,7 +125,7 @@ const Members = () => {
   const memberChanges = useMemo(() => {
     if (!editMember || !originalMember) return [];
     const fields = [
-      ["itsId", "ITS ID"], ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["dateOfBirth", "Date of birth"],
+      ["itsId", "ITS ID"], ["name", "Full name"], ["email", "Email"], ["phone", "Phone"], ["dateOfBirth", "Date of birth"], ["joinedYear", "Joined Saifee Rovers"],
       ["profession", "Profession"], ["professionDetails", "Profession details"], ["patrol", "Patrol"],
       ["maritalStatus", "Marital status"], ["spouseName", "Spouse name"], ["spouseDateOfBirth", "Spouse date of birth"], ["marriageDate", "Marriage date"], ["children", "Children"],
       ["instrument", "Instrument"], ["status", "Member status"], ["isPatrolLeader", "Patrol leader"],
@@ -325,6 +325,7 @@ const Members = () => {
       minWidth: 120,
       render: (member) => member.patrol || "Not assigned",
     },
+    { id: "joinedYear", label: "Joined Year", sortable: true, minWidth: 125, render: (member) => member.joinedYear || 2020 },
     {
       id: "isPatrolLeader",
       label: "Patrol role",
@@ -495,6 +496,7 @@ const Members = () => {
           <TextField disabled={dialogMode === "view"} label="Email" type="email" value={editMember?.email || ""} onChange={(event) => setEditMember((current) => ({ ...current, email: event.target.value }))} />
           <TextField disabled={dialogMode === "view"} label="Phone" value={editMember?.phone || ""} onChange={(event) => setEditMember((current) => ({ ...current, phone: event.target.value }))} />
           <TextField disabled={dialogMode === "view"} type="date" label="Date of Birth" value={editMember?.dateOfBirth || ""} slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().slice(0, 10) } }} onChange={(event) => setEditMember((current) => ({ ...current, dateOfBirth: event.target.value }))} required />
+          <TextField disabled={dialogMode === "view"} type="number" label="Joined Saifee Rovers in year" value={editMember?.joinedYear || 2020} slotProps={{ htmlInput: { min: 1947, max: new Date().getFullYear(), step: 1 } }} onChange={(event) => setEditMember((current) => ({ ...current, joinedYear: Number(event.target.value) }))} helperText={dialogMode === "edit" ? "Enter a year from 1947 through the current year." : ""} required />
           <TextField disabled={dialogMode === "view"} select label="Profession" value={editMember?.profession || ""} onChange={(event) => setEditMember((current) => ({ ...current, profession: event.target.value, professionDetails: event.target.value === "RETIRED" ? "" : current.professionDetails }))} required>{PROFESSIONS.map((profession) => <MenuItem key={profession} value={profession}>{professionLabel(profession)}</MenuItem>)}</TextField>
           {editMember?.profession && editMember.profession !== "RETIRED" && <TextField disabled={dialogMode === "view"} label={PROFESSION_DETAIL_LABELS[editMember.profession] || "Profession details"} value={editMember?.professionDetails || ""} onChange={(event) => setEditMember((current) => ({ ...current, professionDetails: event.target.value }))} required />}
           <TextField disabled={dialogMode === "view"} select label="Marital Status" value={editMember?.maritalStatus || ""} onChange={(event) => setEditMember((current) => ({ ...current, maritalStatus: event.target.value, ...(event.target.value === "UNMARRIED" ? { spouseName: "", spouseDateOfBirth: "", marriageDate: "", children: [] } : {}) }))} required><MenuItem value="MARRIED">Married</MenuItem><MenuItem value="UNMARRIED">Unmarried</MenuItem></TextField>
@@ -507,7 +509,7 @@ const Members = () => {
           {patrolLeader && <Typography variant="caption" color="text.secondary">{editMember?.patrol} is already led by {patrolLeader.name}; this option is unavailable.</Typography>}
           {dialogMode === "edit" && <Button variant="outlined" startIcon={<FaceRetouchingNaturalOutlined />} onClick={() => setEnrollmentMember(editMember)}>{editMember?.faceEnrolled ? "Update face enrollment" : "Enroll face"}</Button>}
         </Stack></DialogContent>
-        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !/^\d{8}$/.test(editMember?.itsId || "") || !editMember?.name?.trim() || !editMember?.dateOfBirth || !editMember?.profession || !editMember?.maritalStatus || !editFamilyValid || (editMember.profession !== "RETIRED" && !editMember?.professionDetails?.trim()) || (editMember?.patrol !== "OFFICERS" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
+        <DialogActions><Button color="inherit" onClick={closeMember} disabled={saving}>{dialogMode === "view" ? "Close" : "Cancel"}</Button>{dialogMode === "edit" && <Button variant="contained" onClick={requestSaveConfirmation} disabled={saving || !/^\d{8}$/.test(editMember?.itsId || "") || !editMember?.name?.trim() || !editMember?.dateOfBirth || !Number.isInteger(editMember?.joinedYear) || editMember.joinedYear < 1947 || editMember.joinedYear > new Date().getFullYear() || !editMember?.profession || !editMember?.maritalStatus || !editFamilyValid || (editMember.profession !== "RETIRED" && !editMember?.professionDetails?.trim()) || (editMember?.patrol !== "OFFICERS" && !editMember?.instrument)}>Review changes</Button>}</DialogActions>
       </Dialog>
 
       <Dialog open={reviewOpen} onClose={() => !saving && setReviewOpen(false)} fullWidth maxWidth="sm">

@@ -153,6 +153,10 @@ export default function MemberForm() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
+                <TextField fullWidth type="number" label="Joined Saifee Rovers in year" defaultValue={2020} slotProps={{ htmlInput: { min: 1947, max: new Date().getFullYear(), step: 1 } }} {...register("joinedYear", { valueAsNumber: true, required: "Joined year is required", min: { value: 1947, message: "Joined year cannot be earlier than 1947" }, max: { value: new Date().getFullYear(), message: "Joined year cannot be in the future" } })} error={!!errors.joinedYear} helperText={errors.joinedYear?.message || "Temporary default is 2020; update it when the actual year is known."} />
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField fullWidth select label="Profession" defaultValue="" {...register("profession", { required: "Profession is required" })} error={!!errors.profession} helperText={errors.profession?.message}>
                   {PROFESSIONS.map((profession) => <MenuItem key={profession} value={profession}>{professionLabel(profession)}</MenuItem>)}
                 </TextField>
@@ -223,6 +227,8 @@ export default function MemberForm() {
                     </Typography>
 
                     <Typography><strong>Date of Birth:</strong> {formValues.dateOfBirth || "-"}</Typography>
+
+                    <Typography><strong>Joined Saifee Rovers:</strong> {formValues.joinedYear || 2020}</Typography>
 
                     <Typography><strong>Profession:</strong> {professionLabel(formValues.profession)}</Typography>
 
