@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AppBar, Avatar, Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material";
-import { CakeOutlined, CollectionsOutlined, DashboardOutlined, EventOutlined, FactCheckOutlined, FavoriteOutlined, LeaderboardOutlined, LogoutOutlined, MenuOutlined, PersonOutlined, ReceiptLongOutlined } from "@mui/icons-material";
+import { CakeOutlined, CollectionsOutlined, DashboardOutlined, EventOutlined, FactCheckOutlined, FavoriteOutlined, LeaderboardOutlined, LogoutOutlined, MenuOutlined, NightsStayOutlined, PersonOutlined, ReceiptLongOutlined } from "@mui/icons-material";
 import logo from "../assets/logo.png";
 import Footer from "../components/layout/Footer";
 import { clearSession, getStoredUser } from "../utils/auth";
@@ -15,6 +15,7 @@ const links = [
   { label: "Gallery", path: "/member/gallery", icon: CollectionsOutlined },
   { label: "Patrol Dashboard", path: "/member/patrol-dashboard", icon: LeaderboardOutlined },
   { label: "Birthdays", path: "/member/birthdays", icon: CakeOutlined },
+  { label: "Waras", path: "/member/waras", icon: NightsStayOutlined },
   { label: "Anniversaries", path: "/member/anniversaries", icon: FavoriteOutlined },
 ];
 

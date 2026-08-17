@@ -24,6 +24,7 @@ import Anniversaries from "./pages/anniversaries/Anniversaries";
 import LandingPage from "./pages/LandingPage";
 import Receipts from "./pages/receipts/Receipts";
 import Enquiries from "./pages/enquiries/Enquiries";
+import Waras from "./pages/waras/Waras";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/patrol-scoreboard" element={<PatrolScoreboard />} />
         <Route path="/birthdays" element={<Birthdays />} />
+        <Route path="/waras" element={<Waras />} />
         <Route path="/anniversaries" element={<Anniversaries />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/profile" element={<AdminProfile />} />
@@ -62,6 +64,7 @@ function App() {
         <Route path="/member/gallery" element={<Gallery />} />
         <Route path="/member/patrol-dashboard" element={<PatrolScoreboard readOnly />} />
         <Route path="/member/birthdays" element={<Birthdays />} />
+        <Route path="/member/waras" element={<Waras />} />
         <Route path="/member/anniversaries" element={<Anniversaries />} />
         <Route path="/member/profile" element={<MemberProfile />} />
         <Route path="/member/receipts" element={<Receipts />} />

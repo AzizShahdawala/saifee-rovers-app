@@ -9,6 +9,7 @@ import CollectionsOutlinedIcon from "@mui/icons-material/CollectionsOutlined";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import ContactMailOutlinedIcon from "@mui/icons-material/ContactMailOutlined";
+import NightsStayOutlinedIcon from "@mui/icons-material/NightsStayOutlined";
 
 const navigation = [
   {
@@ -55,6 +56,11 @@ const navigation = [
     title: "Birthdays",
     icon: CakeOutlinedIcon,
     path: "/birthdays",
+  },
+  {
+    title: "Waras",
+    icon: NightsStayOutlinedIcon,
+    path: "/waras",
   },
   {
     title: "Anniversaries",

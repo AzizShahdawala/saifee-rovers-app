@@ -25,6 +25,7 @@ import WebcamCapture from "./WebcamCapture";
 import ImagePreview from "./ImagePreview";
 import EnrollmentStatus from "./EnrollmentStatus";
 import CaptureProgress from "./CaptureProgress";
+import HijriDatePicker from "./HijriDatePicker";
 
 import Loader from "../common/Loader";
 
@@ -154,7 +155,8 @@ export default function MemberForm() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Hijri Date of Birth" placeholder="1442-09-15" inputProps={{ inputMode: "numeric", maxLength: 10 }} {...register("hijriDateOfBirth", { required: "Hijri date of birth is required", validate: (value) => isValidHijriDate(value) || "Use YYYY-MM-DD in the Umm al-Qura calendar" })} error={!!errors.hijriDateOfBirth} helperText={errors.hijriDateOfBirth?.message || "Umm al-Qura calendar format: YYYY-MM-DD"} />
+                <input type="hidden" {...register("hijriDateOfBirth", { required: "Hijri date of birth is required", validate: (value) => isValidHijriDate(value) || "Select a valid Umm al-Qura date" })} />
+                <HijriDatePicker value={formValues.hijriDateOfBirth || ""} onChange={(value) => setValue("hijriDateOfBirth", value, { shouldValidate: true, shouldDirty: true })} required error={!!errors.hijriDateOfBirth} helperText={errors.hijriDateOfBirth?.message || "Select the member's Islamic-calendar birth date"} />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
