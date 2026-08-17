@@ -25,6 +25,7 @@ import LandingPage from "./pages/LandingPage";
 import Receipts from "./pages/receipts/Receipts";
 import Enquiries from "./pages/enquiries/Enquiries";
 import Waras from "./pages/waras/Waras";
+import Marketplace from "./pages/marketplace/Marketplace";
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
         <Route path="/profile" element={<AdminProfile />} />
         <Route path="/receipts" element={<Receipts />} />
         <Route path="/enquiries" element={<Enquiries />} />
+        <Route path="/marketplace" element={<Marketplace />} />
       </Route>
 
       <Route element={<ProtectedRoute role="member"><MemberLayout /></ProtectedRoute>}>
@@ -68,6 +70,7 @@ function App() {
         <Route path="/member/anniversaries" element={<Anniversaries />} />
         <Route path="/member/profile" element={<MemberProfile />} />
         <Route path="/member/receipts" element={<Receipts />} />
+        <Route path="/member/marketplace" element={<Marketplace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -10,6 +10,7 @@ import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import ContactMailOutlinedIcon from "@mui/icons-material/ContactMailOutlined";
 import NightsStayOutlinedIcon from "@mui/icons-material/NightsStayOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 
 const navigation = [
   {
@@ -66,6 +67,11 @@ const navigation = [
     title: "Anniversaries",
     icon: FavoriteOutlinedIcon,
     path: "/anniversaries",
+  },
+  {
+    title: "Marketplace",
+    icon: StorefrontOutlinedIcon,
+    path: "/marketplace",
   },
   {
     title: "Gallery",
