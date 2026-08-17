@@ -337,7 +337,7 @@ export default function Marketplace() {
       <PageHeader
         title="Rovers Marketplace"
         subtitle="Sell, donate and discover useful items within the Saifee Rovers community."
-        action={
+        actions={
           isMember ? (
             <Button
               variant="contained"
@@ -349,6 +349,12 @@ export default function Marketplace() {
           ) : null
         }
       />
+      {!isMember && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Marketplace posts are created from a member account. Sign in through
+          Member Login to post an item for sale or donation.
+        </Alert>
+      )}
       {error && (
         <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>
           {error}
@@ -385,6 +391,16 @@ export default function Marketplace() {
             <Typography color="text.secondary">
               Be the first member to post something useful.
             </Typography>
+            {isMember && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlined />}
+                onClick={() => setCreateOpen(true)}
+                sx={{ mt: 1 }}
+              >
+                Post an item
+              </Button>
+            )}
           </Stack>
         </Paper>
       ) : (
